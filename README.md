@@ -1,5 +1,5 @@
 # HbaseDataGenerate
-專題，用來產生COVID-19的亂數資料
+專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
 ------
 The class BlockData in datamap.java is moved into DataGenerator.java
