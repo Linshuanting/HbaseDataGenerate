@@ -34,7 +34,7 @@ public class MapGenerator {
     // 以2維陣列產生區域
     // 場所代碼從 10000開始
     // EX. x = 2, y = 0, placeCodes = 10002
-    public static void generateBlockData(Random random) {
+    private static void generateBlockData(Random random) {
  
         int x = 0, y = 0;
         int placeCode = 10000;
