@@ -2,8 +2,7 @@
 專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
 ------
-The class **BlockData in datamap.java** is moved into **DataGenerator.java**
-The class **Person in datamap.java** is moved into **People.java**
+The class **BlockData in datamap.java** is moved into **DataGenerator.java** and The class **Person in datamap.java** is moved into **People.java**.
 
 地圖生成的程式碼基本上都被移到 **MapGenerator.java** 裡，MapGenerator 會將地圖資料生成至某路徑下(預設 "./test/map/map.xlsx)，可以到test/map/下載map.xlsx。而DataGenerator就只是到map.xlsx裡讀取地圖，隨機生成一些人隨機拜訪某些場所生成資料。
 
