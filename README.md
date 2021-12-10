@@ -22,6 +22,6 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
     4 : 白天夜晚都會活動，路線固定
     5 : 白天夜晚都會活動，路線不固定
     6 : 活動時間與路徑相對隨機
-    */
+*/
 ```
 ----
