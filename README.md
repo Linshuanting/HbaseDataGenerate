@@ -26,3 +26,4 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
 ```
 ----
 [Google Map API](https://developers.google.com/maps/gmp-get-started?hl=zh-tw)
+90天免費之後疑似要收費?
