@@ -17,7 +17,7 @@ public class MapGenerator {
     private static BlockData[] blockDatas;
 
     static {
-        blockSize = 100;
+        blockSize = 10000;
         blockLength = (int)Math.sqrt(blockSize);
         blockDatas = new BlockData[blockSize];
     }
@@ -32,7 +32,7 @@ public class MapGenerator {
 
     
     // 以2維陣列產生區域
-    // 場所代碼從 10000開始
+    // 地址(placeCode) 從10000開始
     // EX. x = 2, y = 0, placeCodes = 10002
     private static void generateBlockData(Random random) {
  
@@ -71,7 +71,7 @@ public class MapGenerator {
         Sheet sheet = null;
         
         if (file.exists()) {
-            IOException exception = new IOException("File Exist Exception");
+            IOException exception = new IOException("File Exists Exception");
             throw exception;
         }
         else {

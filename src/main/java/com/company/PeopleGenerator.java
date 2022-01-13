@@ -73,7 +73,7 @@ public class PeopleGenerator {
         Sheet sheet = null;
         
         if (file.exists()) {
-            IOException exception = new IOException("File Exist Exception");
+            IOException exception = new IOException("File Exists Exception");
             throw exception;
         }
         else {
@@ -131,6 +131,15 @@ class Person {
     private String name;
     private String phoneNum;
     private String [] time;
+    /* Definiton of living pattern
+    1 : 白天活動，活動路線固定
+    3 : 白天活動，路線不固定
+    2 : 晚上活動，路線固定
+    3 : 晚上活動，路線不固定
+    4 : 白天夜晚都會活動，路線固定
+    5 : 白天夜晚都會活動，路線不固定
+    6 : 活動時間與路徑相對隨機 (已完成)
+    */
     private int livingPattern;
     private int [] placeCodes;
     private long [] positionCodes;
@@ -146,9 +155,9 @@ class Person {
     public String getName() {
         return name;
     }
-    /*public void setName(String name) {
-        
-    }*/
+    public void setName(String name) {
+        this.name = name;
+    }
     public String getPhoneNum() {
         return phoneNum;
     }

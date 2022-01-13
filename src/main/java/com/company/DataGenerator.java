@@ -13,7 +13,7 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
-
+//import java.lang.Thread;
 public class DataGenerator {
     private static int runStep;
 
@@ -23,21 +23,30 @@ public class DataGenerator {
 
     public static void main(String[] args) throws Exception, IOException {
 
-        int numOfGeneration = 5;
+        final int numOfGeneration = 1;
         Random random = new Random();
+        
         BlockData[] blockDatas = new BlockData[MapGenerator.getBlockSize()];
-        blockDatas = readFromXlsx("./test/map/map.xlsx");
+        blockDatas = (BlockData[]) readFromXlsx("./test/map/map.xlsx", blockDatas);
+        Person[] people = new Person[PeopleGenerator.getNumOfPeople()];
+        people = (Person[]) readFromXlsx("./test/people/people.xlsx", people);
 
         for(int i=0; i<numOfGeneration; i++) {
-            Person apple = new Person("Apple");
-            generateDataToPerson(apple, random, blockDatas);
-            writeToXlsx(apple, "./test/mytest01/test2.xlsx");
-            apple = null;
+            int j = 0;
+            for (Person p : people) {
+                System.out.println("Starting generation of the "+ j + "-th person's data.");
+                generateDataToPerson(p, random, blockDatas);
+                j++;
+            }
+            String filePath = new String("./test/data/data_" + Integer.toString(i) + "1.xlsx");
+            writeToXlsx(people, filePath);
+
         }
+        
         return;
     }
-
-    public static BlockData[] readFromXlsx(String filePath) throws IOException {
+    
+    public static Object[] readFromXlsx(String filePath, Object[] objects) throws IOException {
         File file = new File(filePath);
         XSSFWorkbook xssf;
         Sheet sheet;
@@ -48,24 +57,41 @@ public class DataGenerator {
         }
         else {
             IOException exception = new IOException("File Not Found!");
+            exception.printStackTrace();
             throw exception;
         }
 
-        int blockSize = MapGenerator.getBlockSize();
-        BlockData[] blockDatas = new BlockData[blockSize];
-        
-        int i = 0;
-        for (Row row : sheet) {
-            blockDatas[i] = new BlockData();
-            blockDatas[i].setPlaceCode((int) row.getCell(0).getNumericCellValue());
-            blockDatas[i].setPositionCode((long) row.getCell(1).getNumericCellValue());
-            blockDatas[i].setPositionBoolean(row.getCell(2).getBooleanCellValue());
-            i++;
-        }
+        if(objects.getClass().getName().equals("[Lcom.company.BlockData;")) {
+            int blockSize = MapGenerator.getBlockSize();
+            BlockData[] blockDatas = new BlockData[blockSize];
+            
+            int i = 0;
+            for (Row row : sheet) {
+                blockDatas[i] = new BlockData();
+                blockDatas[i].setPlaceCode((int) row.getCell(0).getNumericCellValue());
+                blockDatas[i].setPositionCode((long) row.getCell(1).getNumericCellValue());
+                blockDatas[i].setPositionBoolean(row.getCell(2).getBooleanCellValue());
+                i++;
+            }
+            return blockDatas;
+        } else if(objects.getClass().getName().equals("[Lcom.company.Person;")) {
+            int numOfPeople = PeopleGenerator.getNumOfPeople();
+            Person[] people = new Person[numOfPeople];
 
-        return blockDatas;
+            int i = 0;
+            for(Row row : sheet) {
+                people[i] = new Person();
+                people[i].setName(row.getCell(0).getStringCellValue());
+                people[i].setePhoneNum(row.getCell(1).getStringCellValue());
+                i++;
+            }
+            return people;
+        }
+        System.out.println("Error: type of " + objects + "(" + objects.getClass() + ") is not allowed.");
+        return null;
     }
-    public static void writeToXlsx(Person p, String filePath) throws IOException {
+
+    public static void writeToXlsx(Person[] people, String filePath) throws IOException {
 
         File file = new File(filePath);
         XSSFWorkbook xssf = null;
@@ -74,7 +100,7 @@ public class DataGenerator {
 
         // 確認檔案存在，如果存在，則向後新增
         if (file.exists()) {
-            System.out.println("File Exist");
+            System.out.println("File Exists");
             FileInputStream fileIn = new FileInputStream(filePath);
             xssf = new XSSFWorkbook (fileIn);
             wb = new SXSSFWorkbook(xssf);
@@ -88,19 +114,22 @@ public class DataGenerator {
         // name, timestamp, placeCode, positionCode
         ArrayList <ArrayList <Object>> objectLists = new ArrayList<ArrayList<Object>> (runStep);
 
-        for (int i = 0; i < runStep; i++) {
-            ArrayList <Object> objectList = new ArrayList<Object> (4);
-            if(p.getPositionBooleans()[i]) {
-                objectList.add(0, p.getPhoneNum());
-                objectList.add(1, p.getTime()[i]);
-                objectList.add(2, p.getPlaceCodes()[i]);
-                objectList.add(3, p.getPositionCodes()[i]);
-                objectLists.add(objectList);
+        for (Person p : people) {
+            for (int i = 0; i < runStep; i++) {
+                ArrayList <Object> objectList = new ArrayList<Object> (4);
+                if(p.getPositionBooleans()[i]) {
+                    objectList.add(0, p.getPhoneNum());
+                    objectList.add(1, p.getTime()[i]);
+                    objectList.add(2, p.getPlaceCodes()[i]);
+                    objectList.add(3, p.getPositionCodes()[i]);
+                    objectLists.add(objectList);
+                }
+                else {  // p.getPositioncodes()[i] == false. The program does not generate data to excel.xlsx
+                }
+                objectList = null;
             }
-            else {  // p.getPositioncodes()[i] == false. The program does not generate data to excel.xlsx
-            }
-            objectList = null;
         }
+
         
         System.out.println("Writing to xlsx file starts.");
 
@@ -130,8 +159,9 @@ public class DataGenerator {
         FileOutputStream fileOut = new FileOutputStream(filePath);
         try {
             wb.write(fileOut);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Write Error");
+            e.printStackTrace();
         }
         System.out.println("Writing to XLSX file Finished ...");
     }
@@ -145,8 +175,8 @@ public class DataGenerator {
         int blockLength = MapGenerator.getBlockLength();
         int startX = random.nextInt(blockLength);
         int startY = random.nextInt(blockLength);
-        int displacementX = 0;
-        int displacementY = 0;
+        int displacementX = 0;  // X位移
+        int displacementY = 0;  // y位移
         int temp;
         int[] currentPos = new int[runStep];
         long[] positionCodes = new long[runStep];
@@ -178,7 +208,7 @@ public class DataGenerator {
             temp = startY;
             startY = runSteps(startY, random, random.nextInt(numOfStep));
             displacementY = startY - temp;
-
+            // if the person didn't move
             if(displacementX == 0 && displacementY == 0)
                 isStay = true;
             else
@@ -191,19 +221,19 @@ public class DataGenerator {
         p.setTime(currentTime);
     }
 
-    // Run multiple steps in 1 iteration. Direcion is fixed if n + s[r] is still in the block.
-    public static int runSteps(int n, Random random, int stepNum) {
+    // Run multiple steps in 1 iteration. Direcion is fixed if location + s[r] is still in the block.
+    public static int runSteps(int location, Random random, int stepNum) {
         int blockLength = MapGenerator.getBlockLength();
         int direction;
-        int[][] s = new int[][]{ {0 , 1, 1, 1, 0, 1, 1, 1},
-                                 {-1, -1, -1, -1, 0, -1, 0, -1} };
+        int[][] s = new int[][]{ {0 , 1, 1, 1, 1, 1, 1, 0},
+                                 {0, -1, -1, -1, 0, -1, -1, -1} };
         int r = random.nextInt(8);
         direction = random.nextInt(2);
         for(int i = 0; i < stepNum; i++) {
-            while ((n + s[direction][r]) <= 0 || (n + s[direction][r]) >= blockLength)
-                r = random.nextInt(8);
-            n += s[direction][r];
+            if((location + s[direction][r]) < 0 || (location + s[direction][r]) >= blockLength)  // boundary check
+                r = 0;
+            location += s[direction][r];
         }
-        return n;
+        return location;
     }
 }
