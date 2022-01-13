@@ -12,6 +12,8 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
 
 **test/data/data_1.xlsx is the sample data generated from DataGenerator.java**
 
+地圖改為100*100，有1000個人走訪地圖。人與地圖資訊都是從test資料夾下的excel讀取而來。
+
 ![](/../patch-1/assets/DefinitionOfLivingPattern.jpg)
 
 **有甚麼想法就寫在下面吧**，數量和內容都能改
