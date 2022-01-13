@@ -10,6 +10,8 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
 
 ~~TODO: 接下來可能可以寫個~~ 現在 **PeopleGenerator.java** 生成固定的居民到excel裡面同時把class **Person**移進去，**TODO:** 不同的人可以有不同的移動、生活模式，除此之外還得考慮時間像是白天活動或是晚上活動等等。這樣地圖和人都確定下來，生成資料應該會比較容易。
 
+**test/data/data_1.xlsx is the sample data generated from DataGenerator.java**
+
 ![](/../patch-1/assets/DefinitionOfLivingPattern.jpg)
 
 **有甚麼想法就寫在下面吧**，數量和內容都能改
