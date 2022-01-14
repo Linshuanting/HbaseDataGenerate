@@ -12,16 +12,10 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MapGenerator {
-    private static int blockSize;
-    private static int blockLength;
-    private static BlockData[] blockDatas;
-
-    static {
-        blockSize = 10000;
-        blockLength = (int)Math.sqrt(blockSize);
-        blockDatas = new BlockData[blockSize];
-    }
-
+    final private static int blockSize = 10000;
+    final private static int blockLength = (int) Math.sqrt(blockSize);
+    private static BlockData[] blockDatas = new BlockData[blockSize];
+    
     // Generate the Map
     public static void main(String[] args) throws Exception, IOException {
         Random random = new Random();

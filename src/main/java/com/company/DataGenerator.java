@@ -15,11 +15,7 @@ import java.util.ArrayList;
 import java.util.Random;
 //import java.lang.Thread;
 public class DataGenerator {
-    private static int runStep;
-
-    static {
-        runStep = 10;
-    }
+    final private static int runStep = 10;
 
     public static void main(String[] args) throws Exception, IOException {
 
@@ -38,7 +34,7 @@ public class DataGenerator {
                 generateDataToPerson(p, random, blockDatas);
                 j++;
             }
-            String filePath = new String("./test/data/data_" + Integer.toString(i) + "1.xlsx");
+            String filePath = new String("./test/data/data_" + Integer.toString(i) + ".xlsx");
             writeToXlsx(people, filePath);
 
         }
@@ -61,7 +57,7 @@ public class DataGenerator {
             throw exception;
         }
 
-        if(objects.getClass().getName().equals("[Lcom.company.BlockData;")) {
+        if(objects instanceof BlockData[]) {
             int blockSize = MapGenerator.getBlockSize();
             BlockData[] blockDatas = new BlockData[blockSize];
             
@@ -74,7 +70,7 @@ public class DataGenerator {
                 i++;
             }
             return blockDatas;
-        } else if(objects.getClass().getName().equals("[Lcom.company.Person;")) {
+        } else if(objects instanceof Person[]) {
             int numOfPeople = PeopleGenerator.getNumOfPeople();
             Person[] people = new Person[numOfPeople];
 
@@ -97,6 +93,7 @@ public class DataGenerator {
         XSSFWorkbook xssf = null;
         SXSSFWorkbook wb = null;
         Sheet sheet = null;
+        final int numOfPeople = PeopleGenerator.getNumOfPeople();
 
         // 確認檔案存在，如果存在，則向後新增
         if (file.exists()) {
@@ -107,13 +104,13 @@ public class DataGenerator {
             sheet = wb.getSheetAt(0);
         }
         else {
-            wb = new SXSSFWorkbook(runStep);
+            wb = new SXSSFWorkbook(runStep * numOfPeople);
             sheet      = wb.createSheet();
         }
 
         // name, timestamp, placeCode, positionCode
-        ArrayList <ArrayList <Object>> objectLists = new ArrayList<ArrayList<Object>> (runStep);
-
+        
+        ArrayList <ArrayList <Object>> objectLists = new ArrayList<ArrayList<Object>> (runStep * numOfPeople);
         for (Person p : people) {
             for (int i = 0; i < runStep; i++) {
                 ArrayList <Object> objectList = new ArrayList<Object> (4);
@@ -188,7 +185,7 @@ public class DataGenerator {
         int timeInterval = 0;
         for (int i = 0; i < DataGenerator.runStep; i++) {
             // 將時間與場所代碼放入person
-            // 每次走一步，X +-01, Y +- 0,10
+            // 每走一步，X +-01, Y +- 0,10
             // 時間間隔亂數產生
             int pos = startX + 10 * startY;
             currentPos[i] = blockDatas[pos].getPlaceCode();
@@ -196,7 +193,7 @@ public class DataGenerator {
             currentTime[i] = dateTime.plusSeconds(timeInterval).toString();
             timeInterval += random.nextInt(3000) + 600;
             
-            if(isStay)
+            if(isStay)  // Which means the person dose not move during this iteration
                 isPositionCodeExist[i] = false;
             else
                 isPositionCodeExist[i] = blockDatas[pos].getPositionBoolean();

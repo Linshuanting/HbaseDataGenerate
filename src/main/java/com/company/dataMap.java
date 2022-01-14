@@ -5,35 +5,37 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+*/
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class dataMap {
+public class dataMap {/*
     //private static int timeRange;
     private static int runStep;
 
     static {
         //timeRange = 500;
         runStep = 20;
-    }
+    }*/
 
-    public static void main(String[] args) throws Exception, IOException {
-        
+    public static void main(String[] args) /*throws Exception, IOException*/ {
+        /*
         int numOfGeneration = 1;
         Random random = new Random();
         BlockData[] blockDatas = readFromXlsx("./test/map/map.xlsx");
-        
         for(int i=0; i<numOfGeneration; i++) {
             Person apple = new Person("Apple");
             generateDataToPerson(apple, random, blockDatas);
             writeToXlsx(apple, "./test/mytest01/test1.xlsx");
             apple = null;
-        }
+        }*/
+
+
         return;
     }
+}
     /*public static void test(Person p) {
         p.setName("Banana");
     }*/

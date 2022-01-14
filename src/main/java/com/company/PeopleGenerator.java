@@ -11,12 +11,8 @@ import java.util.ArrayList;
 import java.io.*;
 
 public class PeopleGenerator {
-    private static int numOfPeople = 1000;
-    private static Person[] people;
-
-    static {
-        people = new Person[numOfPeople];
-    }
+    final private static int numOfPeople = 1000;
+    private static Person[] people = new Person[numOfPeople];
 
     // Generate people list
     public static void main(String[] args) throws IOException {
