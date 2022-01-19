@@ -1,4 +1,5 @@
 # HbaseDataGenerate
+
 專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
 ------
@@ -31,7 +32,9 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
 */
 ```
 ----
+<<<<<<< HEAD
 [Google Map API](https://developers.google.com/maps/gmp-get-started?hl=zh-tw)
 90天免費之後疑似要收費?
 
 https://developers.google.com/maps/documentation/geocoding/overview?hl=zh-tw
+

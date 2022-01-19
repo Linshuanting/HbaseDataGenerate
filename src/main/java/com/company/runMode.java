@@ -13,7 +13,7 @@ public class runMode {
     private static int [][] randomRunUp;
     private static int [][] randomRunDown;
     private static int [][][] randomRun;
-
+    
     private static int [][] leftRun;
     private static int [][] rightRun;
     private static int [][] upRun;
@@ -67,7 +67,7 @@ public class runMode {
     }
 
     public  void mytest(){
-        System.out.println(randomRun.length);
+        System.out.println(randomRun. );
     }
 
     private void setXY(pair<Integer, Integer> XY){
