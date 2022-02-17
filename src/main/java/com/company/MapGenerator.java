@@ -15,11 +15,13 @@ public class MapGenerator {
     final private static int blockSize = 10000;
     final private static int blockLength = (int) Math.sqrt(blockSize);
     private static BlockData[] blockDatas = new BlockData[blockSize];
+    private static int clusterNum = 100;
     
     // Generate the Map
     public static void main(String[] args) throws Exception, IOException {
         Random random = new Random();
         generateBlockData(random);
+        generateRandomCluster(blockSize);
         writeToXlsx("./test/map/map.xlsx");
         return;
     }
@@ -31,7 +33,7 @@ public class MapGenerator {
     private static void generateBlockData(Random random) {
  
         int x = 0, y = 0;
-        int placeCode = 10000;
+        int placeCode = blockSize;
         
         HashMap <Integer, Long> map = new HashMap <Integer, Long> (blockSize);
         long positionCode = 0;
@@ -58,6 +60,23 @@ public class MapGenerator {
             blockDatas[i] = new BlockData(x++, y, placeCode++, isPositionCodeExist, positionCode);
         }
     }
+
+    public static void generateRandomCluster(int area){
+        Random random = new Random();
+
+        for (int NeedNum = clusterNum; NeedNum > 0; /* do nothing */){
+            int target = random.nextInt(area);
+
+            if (blockDatas[target].getPositionBoolean() == true && blockDatas[target].getClusterBoolean() == false){
+                blockDatas[target].setClusterBoolean(true);
+                NeedNum--;
+            }
+        }
+
+        System.out.println("------Cluster generating finish-------");
+
+        return;
+    }
     
     public static void writeToXlsx(String filePath) throws IOException{
         File file = new File(filePath);
@@ -72,13 +91,14 @@ public class MapGenerator {
             wb = new SXSSFWorkbook(blockLength);
             sheet      = wb.createSheet();
         }
-        // (pos, positionCode)
+        // (pos, positionCode, isPositionCode, isCluster)
         ArrayList <Object[]> objectLists = new ArrayList<> (blockSize);
         for(int i=0; i<blockSize; i++) {
-            Object[] objects = new Object[3];
+            Object[] objects = new Object[4];
             objects[0] = blockDatas[i].getPlaceCode();
             objects[1] = blockDatas[i].getPositionCode();
             objects[2] = blockDatas[i].getPositionBoolean();
+            objects[3] = blockDatas[i].getClusterBoolean();
             objectLists.add(objects);
             objects = null;
         }
@@ -114,12 +134,15 @@ public class MapGenerator {
         System.out.println("Writing to XLSX file Finished ...");
     }
 
+
+
     public static int getBlockLength() {
         return blockLength;
     }
     public static int getBlockSize() {
         return blockSize;
     }
+    public static int getClusterNum() { return clusterNum; }
     
 }
 
@@ -129,6 +152,7 @@ class BlockData {
     private int placeCode;
     private long positionCode; 
     private boolean isPositionCodeExist;
+    private boolean isCluster = false;
     
     public BlockData (int xPos, int yPos, int placeCode, boolean isPositionCodeExist, long positionCode) {
         setxPos(xPos);
@@ -176,5 +200,8 @@ class BlockData {
     public void setPositionCode(long positionCode) {
         this.positionCode = positionCode;
     }
+
+    public boolean getClusterBoolean() {return isCluster; };
+    public void setClusterBoolean(boolean isCluster) {this.isCluster = isCluster; }
 
 }

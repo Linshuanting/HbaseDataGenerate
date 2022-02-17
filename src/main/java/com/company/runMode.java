@@ -25,32 +25,32 @@ public class runMode {
                  {0,0,   0,1,1,1,0,-1,-1,-1},
                  {0,0,   1,1,0,-1,-1,-1,0,1}};
          randomRunRight = new int[][] {
-                 {0,0,   0,1,1,1,0,-1,-1,-1,   1,1,1},
-                 {0,0,   1,1,0,-1,-1,-1,0,1,   1,0,-1}};
+                 {0,0,   0,1,1,1,0,-1,-1,-1,   1,1,1,1},
+                 {0,0,   1,1,0,-1,-1,-1,0,1,   1,0,-1,0}};
          randomRunLeft = new int[][] {
-                 {0,0,   0,1,1,1,0,-1,-1,-1,   -1,-1,-1},
-                 {0,0,   1,1,0,-1,-1,-1,0,1,   -1,0,1}};
+                 {0,0,   0,1,1,1,0,-1,-1,-1,   -1,-1,-1,-1},
+                 {0,0,   1,1,0,-1,-1,-1,0,1,   -1,0,1,0}};
          randomRunUp = new int[][] {
-                 {0,0,   0,1,1,1,0,-1,-1,-1,   0,1,-1},
-                 {0,0,   1,1,0,-1,-1,-1,0,1,   1,1,1}};
+                 {0,0,   0,1,1,1,0,-1,-1,-1,   0,1,-1,0},
+                 {0,0,   1,1,0,-1,-1,-1,0,1,   1,1,1,1}};
          randomRunDown = new int[][] {
-                 {0,0,   0,1,1,1,0,-1,-1,-1,   1,0,-1},
-                 {0,0,   1,1,0,-1,-1,-1,0,1,   -1,-1,-1}};
+                 {0,0,   0,1,1,1,0,-1,-1,-1,   1,0,-1,0},
+                 {0,0,   1,1,0,-1,-1,-1,0,1,   -1,-1,-1,-1}};
          randomRun = new int[][][] {
                  randomRunCenter, randomRunLeft, randomRunRight, randomRunUp, randomRunDown
          };
          rightRun = new int[][] {
-                 {0,0,   0,1,1,1,0,-1,-1,-1,   1,1,1, 1,1,1, 1,1,1},
-                 {0,0,   1,1,0,-1,-1,-1,0,1,   1,0,-1, 1,0,-1, 1,0,-1}};
+                 {0,0,   0,1,1,1,0,-1,-1,-1,   1,1,1, 1,1,1, 1,1,1, 1,1,1},
+                 {0,0,   1,1,0,-1,-1,-1,0,1,   1,0,-1, 1,0,-1, 1,0,-1, 1,0,-1}};
          leftRun = new int[][] {
-                 {0,0,   0,1,1,1,0,-1,-1,-1,   -1,-1,-1, -1,-1,-1, -1,-1,-1},
-                 {0,0,   1,1,0,-1,-1,-1,0,1,   -1,0,1, -1,0,1, -1,0,1}};
+                 {0,0,   0,1,1,1,0,-1,-1,-1,   -1,-1,-1, -1,-1,-1, -1,-1,-1, -1,-1,-1},
+                 {0,0,   1,1,0,-1,-1,-1,0,1,   -1,0,1, -1,0,1, -1,0,1, -1,0,1}};
          upRun = new int[][] {
-                 {0,0,   0,1,1,1,0,-1,-1,-1,   0,1,-1, 0,1,-1, 0,1,-1},
-                 {0,0,   1,1,0,-1,-1,-1,0,1,   1,1,1, 1,1,1, 1,1,1}};
+                 {0,0,   0,1,1,1,0,-1,-1,-1,   0,1,-1, 0,1,-1, 0,1,-1, 0,1,-1},
+                 {0,0,   1,1,0,-1,-1,-1,0,1,   1,1,1, 1,1,1, 1,1,1, 1,1,1}};
          downRun = new int[][] {
-                 {0,0,   0,1,1,1,0,-1,-1,-1,   1,0,-1, 1,0,-1, 1,0,-1},
-                 {0,0,   1,1,0,-1,-1,-1,0,1,   -1,-1,-1, -1,-1,-1, -1,-1,-1}};
+                 {0,0,   0,1,1,1,0,-1,-1,-1,   1,0,-1, 1,0,-1, 1,0,-1, 1,0,-1},
+                 {0,0,   1,1,0,-1,-1,-1,0,1,   -1,-1,-1, -1,-1,-1, -1,-1,-1, -1,-1,-1}};
     }
 
     private int bound;
@@ -67,7 +67,7 @@ public class runMode {
     }
 
     public  void mytest(){
-        System.out.println(randomRun. );
+        System.out.println(randomRun);
     }
 
     private void setXY(pair<Integer, Integer> XY){
@@ -97,9 +97,51 @@ public class runMode {
         return "DOWN";
     }
 
-    public pair<Integer, Integer> runSteps(String runType, int runStep, pair<Integer, Integer> XY, int target){
+    public String stop(){ return "STOP"; }
 
+    public String chooseRunType(pair<Integer, Integer>start, pair<Integer, Integer>target){
+
+        if (target.getFirst() < 0 && target.getSecond() < 0)
+            return chooseRANDOM();
+
+        if (target.getFirst() == 0 && target.getSecond() == 0)
+            return stop();
+
+        int differentX = abs(start.getFirst() - target.getFirst());
+        int differentY = abs(start.getSecond() - target.getSecond());
+
+        if (differentX >= differentY){
+            // 目標點 在 現在點 左邊
+            if (start.getFirst() > target.getFirst())
+                return chooseLeft();
+
+            // 目標點 在 現在點 右邊
+            if (start.getFirst() < target.getFirst())
+                return chooseRight();
+        }
+        else {
+            // 目標點 在 現在點 上面
+            if (start.getSecond() < target.getSecond())
+                return chooseUp();
+
+            // 目標點 在 現在點 下面
+            if (start.getSecond() > target.getSecond())
+                return chooseDown();
+        }
+
+        return "-------Error happened in ChooseRunType Function-------";
+    }
+
+    public int abs(int a){
+        //如大於0則直接返回，小於0則再乘個負數將其轉成正數返回
+        return a > 0 ? a : -a;
+    }
+
+    public pair<Integer, Integer> runSteps(int runStep, pair<Integer, Integer> XY, pair<Integer, Integer> target){
+
+        String runType = chooseRunType(XY, target);
         setXY(XY);
+
         if (runType.equals("RANDOM")){
             for (int i = 0; i < runStep; i++) {
                 randomRunOneStep();
@@ -140,17 +182,17 @@ public class runMode {
                 }
             }
         }
+        if (runType.equals("STOP")){
+            // do nothing
+        }
 
         return getXY();
     }
 
     // 判斷是否到達目的地，如果到達，則回傳true
-    private boolean isArrivalTarget(pair<Integer, Integer> nowXY, int target){
+    private boolean isArrivalTarget(pair<Integer, Integer> nowXY, pair<Integer, Integer> target){
 
-        int targetX = target % bound;
-        int targetY = (target / bound) % bound;
-
-        if (targetX == nowXY.getFirst() && targetY == nowXY.getSecond())
+        if (target.getFirst() == nowXY.getFirst() && target.getSecond() == nowXY.getSecond())
             return true;
 
         return false;

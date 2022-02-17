@@ -54,8 +54,12 @@ public class PeopleGenerator {
             for (int i = 0; i < 10; i++) {
                 phoneNumString += Integer.toString(phoneNumber.get(i));
             }
+
+            int livingState = random.nextInt(6) + 1;
+
             people[name] = new Person(Integer.toString(name));
             people[name].setePhoneNum(phoneNumString);
+            people[name].setLivingPattern(livingState);
             phoneNumber = null;
             phoneNumString = null;
         }
@@ -77,12 +81,13 @@ public class PeopleGenerator {
             sheet      = wb.createSheet();
         }
 
-        // (name, phone number)
+        // (name, phone number, living pattern)
         ArrayList <Object[]> objectLists = new ArrayList<> (numOfPeople);
         for(int i=0; i<numOfPeople; i++) {
-            Object[] objects = new Object[2];
+            Object[] objects = new Object[3];
             objects[0] = people[i].getName();
             objects[1] = people[i].getPhoneNum();
+            objects[2] = people[i].getLivingPattern();
             objectLists.add(objects);
             objects = null;
         }
@@ -128,18 +133,18 @@ class Person {
     private String phoneNum;
     private String [] time;
     /* Definiton of living pattern
-    1 : 白天活動，活動路線固定
-    3 : 白天活動，路線不固定
-    2 : 晚上活動，路線固定
-    3 : 晚上活動，路線不固定
-    4 : 白天夜晚都會活動，路線固定
-    5 : 白天夜晚都會活動，路線不固定
+    1 : 早八晚五型，目標相同
+    2 : 早八晚五型，目標不同
+    3 : 早八晚五型，無活動
+    4 : 早八午十二，單目標
+    5 : 午十二晚五，單目標
     6 : 活動時間與路徑相對隨機 (已完成)
     */
     private int livingPattern;
     private int [] placeCodes;
     private long [] positionCodes;
     private boolean [] positionBooleans;
+    private int arrayLength;
 
     public Person(String name) {
         this.name = name;
@@ -190,4 +195,11 @@ class Person {
     public void setPositionCodes(long[] positionCodes) {
         this.positionCodes = positionCodes;
     }
+
+    public int getLivingPattern(){ return livingPattern; }
+    public void setLivingPattern(int livingPattern){ this.livingPattern = livingPattern; }
+
+    public int getArrayLength(){ return arrayLength; }
+    public void setArrayLength(int length){ this.arrayLength = length; }
+    
 }
