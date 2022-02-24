@@ -338,8 +338,12 @@ public class DataGenerator {
             time = time + Integer.toString(min);
         }
         time = time + ":";
-        time += Integer.toString(random.nextInt(60));
-
+        int seconds = random.nextInt(60);
+        if(seconds < 10)
+            time += "0" + Integer.toString(seconds);
+        else
+            time += Integer.toString(seconds);
+            
         return time;
 
     }
