@@ -10,6 +10,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,11 +21,11 @@ public class DataGenerator {
     private static BlockData blockDatas[];
     private static int hourLimits = 12 - 8 + 18 - 13, minInterval = 10;
     private static int minLimits = (60 - 0)/minInterval;
+    private static Random random = new Random();
 
     public static void main(String[] args) throws Exception, IOException {
 
         final int numOfGeneration = 1;
-        Random random = new Random();
         
         blockDatas = new BlockData[MapGenerator.getBlockSize()];
         blockDatas = (BlockData[]) readFromXlsx("./test/map/map.xlsx", blockDatas);
@@ -39,7 +40,7 @@ public class DataGenerator {
                 dailyForOneDay(p, random, blockDatas);
                 j++;
             }
-            String filePath = new String("./test/data/data_" + Integer.toString(i) + ".xlsx");
+            String filePath = new String("./test/data/data_" + LocalDate.now().toString() + ".xlsx");
             writeToXlsx(people, filePath);
 
         }
@@ -184,10 +185,6 @@ public class DataGenerator {
         runMode runMode = new runMode(blockLength);
 
         pair<Integer, Integer> startPos = new pair<Integer, Integer>(random.nextInt(blockLength), random.nextInt(blockLength));
-
-
-
-
     }
 
     public static void dailyForOneDay(Person p, Random random, BlockData[] blockDatas){
@@ -324,7 +321,8 @@ public class DataGenerator {
     public static String getTime(int hour, int min){
 
         // 預設時間
-        String time = "2022/2/16-";
+        LocalDate localDate = LocalDate.now();
+        String time = localDate.toString() + "-";
         if (hour < 10){
             time = time + "0" + Integer.toString(hour);
         }
@@ -339,6 +337,8 @@ public class DataGenerator {
         else{
             time = time + Integer.toString(min);
         }
+        time = time + ":";
+        time += Integer.toString(random.nextInt(60));
 
         return time;
 
@@ -445,7 +445,7 @@ public class DataGenerator {
 
         return now;
     }
-
+    /*
     // 將人物隨機位置開始，並亂數走動
     public static void generateDataToPerson(Person p, Random random, BlockData[] blockDatas) throws IOException {
         
@@ -500,7 +500,7 @@ public class DataGenerator {
         p.setPositionCodes(positionCodes);
         p.setTime(currentTime);
     }
-
+    */
     // Run multiple steps in 1 iteration. Direcion is fixed if location + s[r] is still in the block.
     public static int runSteps(int location, Random random, int stepNum) {
         int blockLength = MapGenerator.getBlockLength();
