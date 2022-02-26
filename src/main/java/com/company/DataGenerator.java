@@ -11,7 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+// import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
 //import java.lang.Thread;
@@ -20,31 +20,31 @@ public class DataGenerator {
     private static BlockData Cluster[] = new BlockData[MapGenerator.getClusterNum()];
     private static BlockData blockDatas[];
     private static int hourLimits = 12 - 8 + 18 - 13, minInterval = 10;
-    private static int minLimits = (60 - 0)/minInterval;
+    private static int minLimits = (60 - 0) / minInterval;
     private static Random random = new Random();
 
     public static void main(String[] args) throws Exception, IOException {
 
-        final int numOfGeneration = 1;
+        final int numOfGeneration = 7;
         
         blockDatas = new BlockData[MapGenerator.getBlockSize()];
         blockDatas = (BlockData[]) readFromXlsx("./test/map/map.xlsx", blockDatas);
         Person[] people = new Person[PeopleGenerator.getNumOfPeople()];
         people = (Person[]) readFromXlsx("./test/people/people.xlsx", people);
+        LocalDate localDate = LocalDate.of(2022, 1, 1);
 
-        for(int i=0; i<numOfGeneration; i++) {
+        for (int i=0; i<numOfGeneration; i++) {
             int j = 0;
             for (Person p : people) {
                 System.out.println("Starting generation of the "+ j + "-th person's data.");
                 //generateDataToPerson(p, random, blockDatas);
-                dailyForOneDay(p, random, blockDatas);
+                dailyForOneDay(p, random, blockDatas, localDate);
                 j++;
             }
-            String filePath = new String("./test/data/data_" + LocalDate.now().toString() + ".xlsx");
+            String filePath = new String("./test/data/data_from_1-1.xlsx");
             writeToXlsx(people, filePath);
-
-        }
-        
+            localDate = localDate.plusDays(1);
+        }       
         return;
     }
     
@@ -80,8 +80,6 @@ public class DataGenerator {
                     Cluster[j++] = blockDatas[i];
 
                 i++;
-
-
             }
             return blockDatas;
         } else if(objects instanceof Person[]) {
@@ -123,8 +121,7 @@ public class DataGenerator {
             sheet      = wb.createSheet();
         }
 
-        // name, timestamp, placeCode, positionCode
-        
+        // name, timestamp, placeCode, positionCode      
         ArrayList <ArrayList <Object>> objectLists = new ArrayList<ArrayList<Object>> (runStep * numOfPeople);
         for (Person p : people) {
             for (int i = 0; i < p.getArrayLength(); i++) {
@@ -141,8 +138,7 @@ public class DataGenerator {
                 objectList = null;
             }
         }
-
-        
+      
         System.out.println("Writing to xlsx file starts.");
 
         int rowNum = 0;
@@ -178,19 +174,14 @@ public class DataGenerator {
         System.out.println("Writing to XLSX file Finished ...");
     }
 
-    public static void generateDataToOnePerson(Person p, Random random, BlockData[] blockDatas, int runStep)throws IOException{
-
+    public static void generateDataToOnePerson(Person p, Random random, BlockData[] blockDatas, int runStep) throws IOException{
         int blockLength = MapGenerator.getBlockLength();
-
         runMode runMode = new runMode(blockLength);
-
         pair<Integer, Integer> startPos = new pair<Integer, Integer>(random.nextInt(blockLength), random.nextInt(blockLength));
     }
 
-    public static void dailyForOneDay(Person p, Random random, BlockData[] blockDatas){
-
+    public static void dailyForOneDay(Person p, Random random, BlockData[] blockDatas, LocalDate localDate){
         int blockLength = MapGenerator.getBlockLength();
-
         // 從Cluster中產生目標點
         int firstPlaceCode =  Cluster[random.nextInt(blockLength)].getPlaceCode();
         int secondPlaceCode = Cluster[random.nextInt(blockLength)].getPlaceCode();
@@ -244,10 +235,8 @@ public class DataGenerator {
 
         // 早上
         for (int hours = 8; hours < 12 && (targetArrival == false); hours++){
-
             // 每次10分鐘一步，看結果
             for (int min = 0; min < 60 && (targetArrival == false); min+=minInterval){
-
                 nowXY = runMap(nowXY, firstTargetXY);
 
                 // 判斷有無到達目標，有則上午目標結束
@@ -258,21 +247,17 @@ public class DataGenerator {
 
                 // 判斷此點是否有positionCode，有則需要紀錄(目標)
                 // 目前是直接紀錄
-                dataRecord(currentPos, positionCodes, currentTime, isPositionCodeExist, counter, hours, min, nowXY);
+                dataRecord(currentPos, positionCodes, currentTime, isPositionCodeExist, counter, localDate, hours, min, nowXY);
                 counter++;
-
             }
-
         }
 
         targetArrival = false;
 
         // 晚上
         for (int hours = 13; hours < 18; hours++){
-
             // 每次10分鐘一步，看結果
             for (int min = 0; min < 60 && targetArrival == false; min+=minInterval){
-
                 nowXY = runMap(nowXY, secondTargetXY);
 
                 // 判斷有無到達目標，有則上午目標結束
@@ -283,7 +268,7 @@ public class DataGenerator {
 
                 // 判斷此點是否有positionCode，有則需要紀錄(目標)
                 // 目前是直接紀錄
-                dataRecord(currentPos, positionCodes, currentTime, isPositionCodeExist, counter, hours, min, nowXY);
+                dataRecord(currentPos, positionCodes, currentTime, isPositionCodeExist, counter, localDate, hours, min, nowXY);
                 counter++;
 
             }
@@ -294,10 +279,9 @@ public class DataGenerator {
         p.setPositionCodes(positionCodes);
         p.setTime(currentTime);
         p.setArrayLength(counter);
-
     }
 
-    public static void dataRecord(int[] currentPos, long[] positionCodes, String[] currentTime, boolean[] isPositionCodeExist,int i, int hour, int min, pair<Integer, Integer> XY){
+    public static void dataRecord(int[] currentPos, long[] positionCodes, String[] currentTime, boolean[] isPositionCodeExist,int i, LocalDate date, int hour, int min, pair<Integer, Integer> XY){
 
         int pos = getPositionFromPair(XY);
 
@@ -305,7 +289,7 @@ public class DataGenerator {
             System.out.println(pos);
         }
         // 時間細節設定
-        String time = getTime(hour, min);
+        String time = getTime(date , hour, min);
 
         //
         currentPos[i] = blockDatas[pos].getPlaceCode();
@@ -314,15 +298,13 @@ public class DataGenerator {
         currentTime[i] = time;
 
         return;
-
     }
 
     // 時間處理函數
-    public static String getTime(int hour, int min){
+    public static String getTime(LocalDate date, int hour, int min){
 
         // 預設時間
-        LocalDate localDate = LocalDate.now();
-        String time = localDate.toString() + "-";
+        String time = date.toString() + "-";
         if (hour < 10){
             time = time + "0" + Integer.toString(hour);
         }
@@ -345,7 +327,6 @@ public class DataGenerator {
             time += Integer.toString(seconds);
             
         return time;
-
     }
 
     // 當離目的地距離為五以內，直接視為到達目的地
@@ -370,9 +351,7 @@ public class DataGenerator {
     }
 
     public static int abs(int a){
-
         return a >= 0 ? a : -1*a;
-
     }
 
     public static boolean isPositionCodeExist(pair<Integer, Integer>XY){
@@ -441,7 +420,7 @@ public class DataGenerator {
 
     public static pair<Integer, Integer> runMap(pair<Integer, Integer>now, pair<Integer, Integer> target){
 
-        Random random = new Random();
+        // Random random = new Random();
 
         // 步數為 runStep
         runMode runMode = new runMode(MapGenerator.getBlockLength());

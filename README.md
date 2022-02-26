@@ -9,11 +9,9 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
 
 接下來我想的到的地圖作法是手動標記，標記一個2維陣列中有場所代碼的點。再來就是將人依據生活模式分類以生成合理資料。
 
-~~TODO: 接下來可能可以寫個~~  
 現在 **PeopleGenerator.java** 生成固定的居民到excel裡面同時把class **Person**移進去，**TODO:** 不同的人可以有不同的移動、生活模式，除此之外還得考慮時間像是白天活動或是晚上活動等等。這樣地圖和人都確定下來，生成資料應該會比較容易。
 
----
-**test/data/data_2022-02-24.xlsx is the sample data generated from DataGenerator.java**
+**test/data/data_from_1-1.xlsx is the sample data generated from DataGenerator.java**
 
 地圖改為100*100，有1000個人走訪地圖。人與地圖資訊都是從test資料夾下的excel讀取而來。
 
@@ -39,8 +37,4 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
     6 : 活動時間與路徑相對隨機 
 */
 ```
-----
-~~[Google Map API](https://developers.google.com/maps/gmp-get-started?hl=zh-tw)90天免費之後疑似要收費?~~
-
-~~https://developers.google.com/maps/documentation/geocoding/overview?hl=zh-tw~~
-
+---
