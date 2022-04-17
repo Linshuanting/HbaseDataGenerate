@@ -14,59 +14,63 @@ import java.time.LocalDate;
 // import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
+
 //import java.lang.Thread;
 public class DataGenerator {
     final private static int runStep = 10;
     private static BlockData Cluster[] = new BlockData[MapGenerator.getClusterNum()];
     private static BlockData blockDatas[];
-    private static int hourLimits = 12 - 8 + 18 - 13, minInterval = 10;
-    private static int minLimits = (60 - 0) / minInterval;
+    // private static int hourLimits = 12 - 8 + 18 - 13, minInterval = 10;
+    // private static int minLimits = (60 - 0) / minInterval;
     private static Random random = new Random();
 
     public static void main(String[] args) throws Exception, IOException {
 
         final int numOfGeneration = 7;
-        
+
         blockDatas = new BlockData[MapGenerator.getBlockSize()];
         blockDatas = (BlockData[]) readFromXlsx("./test/map/map.xlsx", blockDatas);
         Person[] people = new Person[PeopleGenerator.getNumOfPeople()];
         people = (Person[]) readFromXlsx("./test/people/people.xlsx", people);
-        LocalDate localDate = LocalDate.of(2022, 1, 1);
+        LocalDate localDate = LocalDate.of(2022, 1, 22);
 
-        for (int i=0; i<numOfGeneration; i++) {
+        for (int i = 0; i < numOfGeneration; i++) {
             int j = 0;
             for (Person p : people) {
-                System.out.println("Starting generation of the "+ j + "-th person's data.");
-                //generateDataToPerson(p, random, blockDatas);
+                System.out.println("Starting generation of the " + j + "-th person's data.");
+                // generateDataToPerson(p, random, blockDatas);
                 dailyForOneDay(p, random, blockDatas, localDate);
                 j++;
             }
-            String filePath = new String("./test/data/data_from_1-1.xlsx");
+            String filePath = new String("./test/data/data_from_1-22.xlsx");
             writeToXlsx(people, filePath);
             localDate = localDate.plusDays(1);
-        }       
+        }
         return;
     }
-    
+
+    public static final int getRunStep() {
+        return runStep;
+    }
+
     public static Object[] readFromXlsx(String filePath, Object[] objects) throws IOException {
         File file = new File(filePath);
         XSSFWorkbook xssf;
         Sheet sheet;
-        if(file.exists()) {
+        if (file.exists()) {
             FileInputStream fileIn = new FileInputStream(filePath);
-            xssf = new XSSFWorkbook (fileIn);
+            xssf = new XSSFWorkbook(fileIn);
             sheet = xssf.getSheetAt(0);
-        }
-        else {
+        } else {
             IOException exception = new IOException("File Not Found!");
             exception.printStackTrace();
             throw exception;
         }
 
-        if(objects instanceof BlockData[]) {
+        if (objects instanceof BlockData[]) {
             int blockSize = MapGenerator.getBlockSize();
             BlockData[] blockDatas = new BlockData[blockSize];
-            
+
             int i = 0, j = 0;
             for (Row row : sheet) {
                 blockDatas[i] = new BlockData();
@@ -81,21 +85,24 @@ public class DataGenerator {
 
                 i++;
             }
+            xssf.close();
             return blockDatas;
-        } else if(objects instanceof Person[]) {
+        } else if (objects instanceof Person[]) {
             int numOfPeople = PeopleGenerator.getNumOfPeople();
             Person[] people = new Person[numOfPeople];
 
             int i = 0;
-            for(Row row : sheet) {
+            for (Row row : sheet) {
                 people[i] = new Person();
                 people[i].setName(row.getCell(0).getStringCellValue());
                 people[i].setePhoneNum(row.getCell(1).getStringCellValue());
-                people[i].setLivingPattern((int)row.getCell(2).getNumericCellValue());
+                people[i].setLivingPattern((int) row.getCell(2).getNumericCellValue());
                 i++;
             }
+            xssf.close();
             return people;
         }
+        xssf.close();
         System.out.println("Error: type of " + objects + "(" + objects.getClass() + ") is not allowed.");
         return null;
     }
@@ -112,33 +119,32 @@ public class DataGenerator {
         if (file.exists()) {
             System.out.println("File Exists");
             FileInputStream fileIn = new FileInputStream(filePath);
-            xssf = new XSSFWorkbook (fileIn);
+            xssf = new XSSFWorkbook(fileIn);
             wb = new SXSSFWorkbook(xssf);
             sheet = wb.getSheetAt(0);
-        }
-        else {
+        } else {
             wb = new SXSSFWorkbook(runStep * numOfPeople);
-            sheet      = wb.createSheet();
+            sheet = wb.createSheet();
         }
 
-        // name, timestamp, placeCode, positionCode      
-        ArrayList <ArrayList <Object>> objectLists = new ArrayList<ArrayList<Object>> (runStep * numOfPeople);
+        // name, timestamp, placeCode, positionCode
+        ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(runStep * numOfPeople);
         for (Person p : people) {
             for (int i = 0; i < p.getArrayLength(); i++) {
-                ArrayList <Object> objectList = new ArrayList<Object> (4);
-                if(p.getPositionBooleans()[i]) {
+                ArrayList<Object> objectList = new ArrayList<Object>(4);
+                if (p.getPositionBooleans()[i]) {
                     objectList.add(0, p.getPhoneNum());
                     objectList.add(1, p.getTime()[i]);
                     objectList.add(2, p.getPlaceCodes()[i]);
                     objectList.add(3, p.getPositionCodes()[i]);
                     objectLists.add(objectList);
-                }
-                else {  // p.getPositioncodes()[i] == false. The program does not generate data to excel.xlsx
+                } else { // p.getPositioncodes()[i] == false. The program does not generate data to
+                         // excel.xlsx
                 }
                 objectList = null;
             }
         }
-      
+
         System.out.println("Writing to xlsx file starts.");
 
         int rowNum = 0;
@@ -146,7 +152,7 @@ public class DataGenerator {
             rowNum = xssf.getSheetAt(0).getLastRowNum() + 1;
         int columnNum = 0;
 
-        for (ArrayList <Object> list: objectLists) {
+        for (ArrayList<Object> list : objectLists) {
 
             Row row = sheet.createRow(rowNum++);
             columnNum = 0;
@@ -162,11 +168,11 @@ public class DataGenerator {
                     cell.setCellValue((boolean) object);
             }
         }
-
         // 將object存入xlsx
         FileOutputStream fileOut = new FileOutputStream(filePath);
         try {
             wb.write(fileOut);
+            wb.close();
         } catch (IOException e) {
             System.out.println("Write Error");
             e.printStackTrace();
@@ -174,28 +180,30 @@ public class DataGenerator {
         System.out.println("Writing to XLSX file Finished ...");
     }
 
-    public static void generateDataToOnePerson(Person p, Random random, BlockData[] blockDatas, int runStep) throws IOException{
-        int blockLength = MapGenerator.getBlockLength();
-        runMode runMode = new runMode(blockLength);
-        pair<Integer, Integer> startPos = new pair<Integer, Integer>(random.nextInt(blockLength), random.nextInt(blockLength));
-    }
+    // public static void generateDataToOnePerson(Person p, Random random,
+    // BlockData[] blockDatas, int runStep) throws IOException{
+    // int blockLength = MapGenerator.getBlockLength();
+    // runMode runMode = new runMode(blockLength);
+    // pair<Integer, Integer> startPos = new pair<Integer,
+    // Integer>(random.nextInt(blockLength), random.nextInt(blockLength));
+    // }
 
-    public static void dailyForOneDay(Person p, Random random, BlockData[] blockDatas, LocalDate localDate){
+    public static void dailyForOneDay(Person p, Random random, BlockData[] blockDatas, LocalDate localDate) {
         int blockLength = MapGenerator.getBlockLength();
         // 從Cluster中產生目標點
-        int firstPlaceCode =  Cluster[random.nextInt(blockLength)].getPlaceCode();
+        int firstPlaceCode = Cluster[random.nextInt(blockLength)].getPlaceCode();
         int secondPlaceCode = Cluster[random.nextInt(blockLength)].getPlaceCode();
 
         // 判斷此人類型，並決定目標位置
-        switch(p.getLivingPattern()){
+        switch (p.getLivingPattern()) {
             /*
-            1 : 早八晚五型，目標相同
-            2 : 早八晚五型，目標不同
-            3 : 早八晚五型，無活動
-            4 : 早八午十二，單目標
-            5 : 午十二晚五，單目標
-            6 : 活動時間與路徑相對隨機
-            */
+             * 1 : 早八晚五型，目標相同
+             * 2 : 早八晚五型，目標不同
+             * 3 : 早八晚五型，無活動
+             * 4 : 早八午十二，單目標
+             * 5 : 午十二晚五，單目標
+             * 6 : 活動時間與路徑相對隨機
+             */
             case 1:
                 secondPlaceCode = firstPlaceCode;
                 break;
@@ -220,13 +228,14 @@ public class DataGenerator {
         }
 
         // 決定好起始點以及終點
-        pair<Integer, Integer> nowXY = new pair<Integer, Integer>(random.nextInt(blockLength), random.nextInt(blockLength));
+        pair<Integer, Integer> nowXY = new pair<Integer, Integer>(random.nextInt(blockLength),
+                random.nextInt(blockLength));
         pair<Integer, Integer> firstTargetXY = getPairXY(firstPlaceCode);
         pair<Integer, Integer> secondTargetXY = getPairXY(secondPlaceCode);
 
         boolean targetArrival = false;
         int hourLimits = 12 - 8 + 18 - 13, minInterval = 10;
-        int minLimits = (60 - 0)/minInterval;
+        int minLimits = (60 - 0) / minInterval;
         int counter = 0;
         int[] currentPos = new int[hourLimits * minLimits];
         long[] positionCodes = new long[hourLimits * minLimits];
@@ -234,20 +243,21 @@ public class DataGenerator {
         boolean[] isPositionCodeExist = new boolean[hourLimits * minLimits];
 
         // 早上
-        for (int hours = 8; hours < 12 && (targetArrival == false); hours++){
+        for (int hours = 8; hours < 12 && (targetArrival == false); hours++) {
             // 每次10分鐘一步，看結果
-            for (int min = 0; min < 60 && (targetArrival == false); min+=minInterval){
+            for (int min = 0; min < 60 && (targetArrival == false); min += minInterval) {
                 nowXY = runMap(nowXY, firstTargetXY);
 
                 // 判斷有無到達目標，有則上午目標結束
-                if (isArrivalTarget(nowXY, firstTargetXY)){
+                if (isArrivalTarget(nowXY, firstTargetXY)) {
                     nowXY = firstTargetXY;
                     targetArrival = true;
                 }
 
                 // 判斷此點是否有positionCode，有則需要紀錄(目標)
                 // 目前是直接紀錄
-                dataRecord(currentPos, positionCodes, currentTime, isPositionCodeExist, counter, localDate, hours, min, nowXY);
+                dataRecord(currentPos, positionCodes, currentTime, isPositionCodeExist, counter, localDate, hours, min,
+                        nowXY);
                 counter++;
             }
         }
@@ -255,20 +265,21 @@ public class DataGenerator {
         targetArrival = false;
 
         // 晚上
-        for (int hours = 13; hours < 18; hours++){
+        for (int hours = 13; hours < 18; hours++) {
             // 每次10分鐘一步，看結果
-            for (int min = 0; min < 60 && targetArrival == false; min+=minInterval){
+            for (int min = 0; min < 60 && targetArrival == false; min += minInterval) {
                 nowXY = runMap(nowXY, secondTargetXY);
 
                 // 判斷有無到達目標，有則上午目標結束
-                if (isArrivalTarget(nowXY, secondTargetXY)){
+                if (isArrivalTarget(nowXY, secondTargetXY)) {
                     nowXY = secondTargetXY;
                     targetArrival = true;
                 }
 
                 // 判斷此點是否有positionCode，有則需要紀錄(目標)
                 // 目前是直接紀錄
-                dataRecord(currentPos, positionCodes, currentTime, isPositionCodeExist, counter, localDate, hours, min, nowXY);
+                dataRecord(currentPos, positionCodes, currentTime, isPositionCodeExist, counter, localDate, hours, min,
+                        nowXY);
                 counter++;
 
             }
@@ -281,15 +292,16 @@ public class DataGenerator {
         p.setArrayLength(counter);
     }
 
-    public static void dataRecord(int[] currentPos, long[] positionCodes, String[] currentTime, boolean[] isPositionCodeExist,int i, LocalDate date, int hour, int min, pair<Integer, Integer> XY){
+    public static void dataRecord(int[] currentPos, long[] positionCodes, String[] currentTime,
+            boolean[] isPositionCodeExist, int i, LocalDate date, int hour, int min, pair<Integer, Integer> XY) {
 
         int pos = getPositionFromPair(XY);
 
-        if (pos > 10000){
+        if (pos > 10000) {
             System.out.println(pos);
         }
         // 時間細節設定
-        String time = getTime(date , hour, min);
+        String time = getTime(date, hour, min);
 
         //
         currentPos[i] = blockDatas[pos].getPlaceCode();
@@ -301,36 +313,34 @@ public class DataGenerator {
     }
 
     // 時間處理函數
-    public static String getTime(LocalDate date, int hour, int min){
+    public static String getTime(LocalDate date, int hour, int min) {
 
         // 預設時間
-        String time = date.toString() + "-";
-        if (hour < 10){
+        String time = date.toString() + "T";
+        if (hour < 10) {
             time = time + "0" + Integer.toString(hour);
-        }
-        else{
+        } else {
             time = time + Integer.toString(hour);
         }
         time = time + ":";
 
-        if (min < 10){
+        if (min < 10) {
             time = time + "0" + Integer.toString(min);
-        }
-        else{
+        } else {
             time = time + Integer.toString(min);
         }
         time = time + ":";
         int seconds = random.nextInt(60);
-        if(seconds < 10)
+        if (seconds < 10)
             time += "0" + Integer.toString(seconds);
         else
             time += Integer.toString(seconds);
-            
+
         return time;
     }
 
     // 當離目的地距離為五以內，直接視為到達目的地
-    public static boolean isArrivalTarget(pair<Integer, Integer>now, pair<Integer, Integer>target){
+    public static boolean isArrivalTarget(pair<Integer, Integer> now, pair<Integer, Integer> target) {
 
         // 隨機走路，不會到達目標
         if (target.getFirst() < 0 && target.getSecond() < 0)
@@ -340,8 +350,8 @@ public class DataGenerator {
         if (target.getFirst() == 0 && target.getSecond() == 0)
             return true;
 
-        int differentX =  abs(now.getFirst() - target.getFirst());
-        int differentY =  abs(now.getSecond() - target.getSecond());
+        int differentX = abs(now.getFirst() - target.getFirst());
+        int differentY = abs(now.getSecond() - target.getSecond());
 
         if (differentX <= 5 && differentY <= 5)
             return true;
@@ -350,17 +360,17 @@ public class DataGenerator {
 
     }
 
-    public static int abs(int a){
-        return a >= 0 ? a : -1*a;
+    public static int abs(int a) {
+        return a >= 0 ? a : -1 * a;
     }
 
-    public static boolean isPositionCodeExist(pair<Integer, Integer>XY){
+    public static boolean isPositionCodeExist(pair<Integer, Integer> XY) {
 
         // 位置(-1, -1)表示此點不存在
         if (XY.getFirst() < 0 && XY.getSecond() < 0)
             return false;
 
-        int position = XY.getSecond()*MapGenerator.getBlockLength() + XY.getFirst();
+        int position = XY.getSecond() * MapGenerator.getBlockLength() + XY.getFirst();
 
         if (blockDatas[position].getPositionBoolean())
             return true;
@@ -368,7 +378,7 @@ public class DataGenerator {
             return false;
     }
 
-    public static int getPositionFromPair(pair<Integer, Integer>XY){
+    public static int getPositionFromPair(pair<Integer, Integer> XY) {
 
         if (XY.getFirst() == -1 && XY.getSecond() == -1)
             return -1;
@@ -385,11 +395,11 @@ public class DataGenerator {
         if (XY.getSecond() < 0)
             XY.setSecond(0);
 
-        return XY.getFirst() + XY.getSecond()*MapGenerator.getBlockLength();
+        return XY.getFirst() + XY.getSecond() * MapGenerator.getBlockLength();
 
     }
 
-    public static pair<Integer, Integer> getPairXY(int placeCode){
+    public static pair<Integer, Integer> getPairXY(int placeCode) {
 
         if (placeCode == -1)
             return new pair<Integer, Integer>(-1, -1);
@@ -399,8 +409,8 @@ public class DataGenerator {
         int blockLength = MapGenerator.getBlockLength();
         int blockSize = MapGenerator.getBlockSize();
 
-        int X = (placeCode - blockSize)%blockLength;
-        int Y = (placeCode - blockSize)/blockLength;
+        int X = (placeCode - blockSize) % blockLength;
+        int Y = (placeCode - blockSize) / blockLength;
 
         if (X >= blockLength)
             X = blockLength - 1;
@@ -418,7 +428,7 @@ public class DataGenerator {
 
     }
 
-    public static pair<Integer, Integer> runMap(pair<Integer, Integer>now, pair<Integer, Integer> target){
+    public static pair<Integer, Integer> runMap(pair<Integer, Integer> now, pair<Integer, Integer> target) {
 
         // Random random = new Random();
 
@@ -428,72 +438,75 @@ public class DataGenerator {
 
         return now;
     }
+
     /*
-    // 將人物隨機位置開始，並亂數走動
-    public static void generateDataToPerson(Person p, Random random, BlockData[] blockDatas) throws IOException {
-        
-        // 移動runStep次
-        LocalDateTime dateTime = LocalDateTime.now();
-
-        int blockLength = MapGenerator.getBlockLength();
-        int startX = random.nextInt(blockLength);
-        int startY = random.nextInt(blockLength);
-        int displacementX = 0;  // X位移
-        int displacementY = 0;  // y位移
-        int temp;
-        int[] currentPos = new int[runStep];
-        long[] positionCodes = new long[runStep];
-        String[] currentTime = new String[runStep];
-        boolean isStay = false;
-        boolean[] isPositionCodeExist = new boolean[runStep];
-        
-        int numOfStep = 5;
-        int timeInterval = 0;
-        for (int i = 0; i < DataGenerator.runStep; i++) {
-            // 將時間與場所代碼放入person
-            // 每走一步，X +-01, Y +- 0,10
-            // 時間間隔亂數產生
-            int pos = startX + blockLength * startY;
-            currentPos[i] = blockDatas[pos].getPlaceCode();
-            positionCodes[i] = blockDatas[pos].getPositionCode();
-            currentTime[i] = dateTime.plusSeconds(timeInterval).toString();
-            timeInterval += random.nextInt(3000) + 600;
-            
-            if(isStay)  // Which means the person dose not move during this iteration
-                isPositionCodeExist[i] = false;
-            else
-                isPositionCodeExist[i] = blockDatas[pos].getPositionBoolean();
-
-            temp = startX;
-            startX = runSteps(startX, random, random.nextInt(numOfStep));    // 每次走隨機步數
-            displacementX = startX - temp;
-
-            temp = startY;
-            startY = runSteps(startY, random, random.nextInt(numOfStep));
-            displacementY = startY - temp;
-            // if the person didn't move
-            if(displacementX == 0 && displacementY == 0)
-                isStay = true;
-            else
-                isStay = false;
-        }
-
-        p.setPlaceCodes(currentPos);
-        p.setPositionBooleans(isPositionCodeExist);
-        p.setPositionCodes(positionCodes);
-        p.setTime(currentTime);
-    }
-    */
-    // Run multiple steps in 1 iteration. Direcion is fixed if location + s[r] is still in the block.
+     * // 將人物隨機位置開始，並亂數走動
+     * public static void generateDataToPerson(Person p, Random random, BlockData[]
+     * blockDatas) throws IOException {
+     * 
+     * // 移動runStep次
+     * LocalDateTime dateTime = LocalDateTime.now();
+     * 
+     * int blockLength = MapGenerator.getBlockLength();
+     * int startX = random.nextInt(blockLength);
+     * int startY = random.nextInt(blockLength);
+     * int displacementX = 0; // X位移
+     * int displacementY = 0; // y位移
+     * int temp;
+     * int[] currentPos = new int[runStep];
+     * long[] positionCodes = new long[runStep];
+     * String[] currentTime = new String[runStep];
+     * boolean isStay = false;
+     * boolean[] isPositionCodeExist = new boolean[runStep];
+     * 
+     * int numOfStep = 5;
+     * int timeInterval = 0;
+     * for (int i = 0; i < DataGenerator.runStep; i++) {
+     * // 將時間與場所代碼放入person
+     * // 每走一步，X +-01, Y +- 0,10
+     * // 時間間隔亂數產生
+     * int pos = startX + blockLength * startY;
+     * currentPos[i] = blockDatas[pos].getPlaceCode();
+     * positionCodes[i] = blockDatas[pos].getPositionCode();
+     * currentTime[i] = dateTime.plusSeconds(timeInterval).toString();
+     * timeInterval += random.nextInt(3000) + 600;
+     * 
+     * if(isStay) // Which means the person dose not move during this iteration
+     * isPositionCodeExist[i] = false;
+     * else
+     * isPositionCodeExist[i] = blockDatas[pos].getPositionBoolean();
+     * 
+     * temp = startX;
+     * startX = runSteps(startX, random, random.nextInt(numOfStep)); // 每次走隨機步數
+     * displacementX = startX - temp;
+     * 
+     * temp = startY;
+     * startY = runSteps(startY, random, random.nextInt(numOfStep));
+     * displacementY = startY - temp;
+     * // if the person didn't move
+     * if(displacementX == 0 && displacementY == 0)
+     * isStay = true;
+     * else
+     * isStay = false;
+     * }
+     * 
+     * p.setPlaceCodes(currentPos);
+     * p.setPositionBooleans(isPositionCodeExist);
+     * p.setPositionCodes(positionCodes);
+     * p.setTime(currentTime);
+     * }
+     */
+    // Run multiple steps in 1 iteration. Direcion is fixed if location + s[r] is
+    // still in the block.
     public static int runSteps(int location, Random random, int stepNum) {
         int blockLength = MapGenerator.getBlockLength();
         int direction;
-        int[][] s = new int[][]{ {0 , 1, 1, 1, 1, 1, 1, 0},
-                                 {0, -1, -1, -1, 0, -1, -1, -1} };
+        int[][] s = new int[][] { { 0, 1, 1, 1, 1, 1, 1, 0 },
+                { 0, -1, -1, -1, 0, -1, -1, -1 } };
         int r = random.nextInt(8);
         direction = random.nextInt(2);
-        for(int i = 0; i < stepNum; i++) {
-            if((location + s[direction][r]) < 0 || (location + s[direction][r]) >= blockLength)  // boundary check
+        for (int i = 0; i < stepNum; i++) {
+            if ((location + s[direction][r]) < 0 || (location + s[direction][r]) >= blockLength) // boundary check
                 r = 0;
             location += s[direction][r];
         }

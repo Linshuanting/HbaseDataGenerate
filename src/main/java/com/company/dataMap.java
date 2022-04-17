@@ -6,19 +6,15 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 */
-import java.io.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Random;
 
-public class dataMap {/*
-    //private static int timeRange;
-    private static int runStep;
+public class dataMap {
+    // private static int timeRange;
+    // private static int runStep;
 
-    static {
-        //timeRange = 500;
-        runStep = 20;
-    }*/
+    // static {
+    //     timeRange = 500;
+    //     runStep = 20;
+    // }
 
     public static void main(String[] args) /*throws Exception, IOException*/ {
         /*

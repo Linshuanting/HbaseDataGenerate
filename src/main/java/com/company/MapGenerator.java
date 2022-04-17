@@ -128,6 +128,7 @@ public class MapGenerator {
         FileOutputStream fileOut = new FileOutputStream(filePath);
         try {
             wb.write(fileOut);
+            wb.close();
         } catch (Exception e) {
             System.out.println("Write Error");
         }

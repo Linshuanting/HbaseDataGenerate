@@ -112,11 +112,11 @@ public class PeopleGenerator {
                     cell.setCellValue((boolean) object);
             }
         }
-
         // 將object存入xlsx
         FileOutputStream fileOut = new FileOutputStream(filePath);
         try {
             wb.write(fileOut);
+            wb.close();
         } catch (Exception e) {
             System.out.println("Write Error");
         }
