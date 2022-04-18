@@ -26,26 +26,43 @@ public class DataGenerator {
 
     public static void main(String[] args) throws Exception, IOException {
 
-        final int numOfGeneration = 7;
+        final int numOfGeneration = 1000;
+        LocalDate localDate = LocalDate.of(2020, 1, 1);
+        String filePath = new String("./test/data/data_from_" + localDate.toString() + ".xlsx");
 
         blockDatas = new BlockData[MapGenerator.getBlockSize()];
         blockDatas = (BlockData[]) readFromXlsx("./test/map/map.xlsx", blockDatas);
         Person[] people = new Person[PeopleGenerator.getNumOfPeople()];
         people = (Person[]) readFromXlsx("./test/people/people.xlsx", people);
-        LocalDate localDate = LocalDate.of(2022, 1, 22);
+
+        ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(
+                runStep * PeopleGenerator.getNumOfPeople());
 
         for (int i = 0; i < numOfGeneration; i++) {
-            int j = 0;
+            System.out.println("Starting generation of the " + (Integer.toString(i + 1)) + "-th day's data.");
             for (Person p : people) {
-                System.out.println("Starting generation of the " + j + "-th person's data.");
                 // generateDataToPerson(p, random, blockDatas);
                 dailyForOneDay(p, random, blockDatas, localDate);
-                j++;
+                for (int j = 0; j < p.getArrayLength(); j++) {
+                    ArrayList<Object> objectList = new ArrayList<Object>(4);
+                    if (p.getPositionBooleans()[j]) {
+                        objectList.add(0, p.getPhoneNum());
+                        objectList.add(1, p.getTime()[j]);
+                        objectList.add(2, p.getPlaceCodes()[j]);
+                        objectList.add(3, p.getPositionCodes()[j]);
+                        objectLists.add(objectList);
+                    } else { // p.getPositioncodes()[i] == false. The program does not generate data to
+                             // excel.xlsx
+                    }
+                    objectList = null;
+                }
+                p = null;
             }
-            String filePath = new String("./test/data/data_from_1-22.xlsx");
-            writeToXlsx(people, filePath);
+
+            System.gc();
             localDate = localDate.plusDays(1);
         }
+        writeToXlsx(objectLists, filePath);
         return;
     }
 
@@ -107,7 +124,7 @@ public class DataGenerator {
         return null;
     }
 
-    public static void writeToXlsx(Person[] people, String filePath) throws IOException {
+    public static void writeToXlsx(ArrayList<ArrayList<Object>> objectLists, String filePath) throws IOException {
 
         File file = new File(filePath);
         XSSFWorkbook xssf = null;
@@ -128,22 +145,6 @@ public class DataGenerator {
         }
 
         // name, timestamp, placeCode, positionCode
-        ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(runStep * numOfPeople);
-        for (Person p : people) {
-            for (int i = 0; i < p.getArrayLength(); i++) {
-                ArrayList<Object> objectList = new ArrayList<Object>(4);
-                if (p.getPositionBooleans()[i]) {
-                    objectList.add(0, p.getPhoneNum());
-                    objectList.add(1, p.getTime()[i]);
-                    objectList.add(2, p.getPlaceCodes()[i]);
-                    objectList.add(3, p.getPositionCodes()[i]);
-                    objectLists.add(objectList);
-                } else { // p.getPositioncodes()[i] == false. The program does not generate data to
-                         // excel.xlsx
-                }
-                objectList = null;
-            }
-        }
 
         System.out.println("Writing to xlsx file starts.");
 
@@ -167,12 +168,18 @@ public class DataGenerator {
                 if (object instanceof Boolean)
                     cell.setCellValue((boolean) object);
             }
+            list = null;
         }
+        objectLists = null;
         // 將object存入xlsx
         FileOutputStream fileOut = new FileOutputStream(filePath);
         try {
             wb.write(fileOut);
             wb.close();
+            wb = null;
+            sheet = null;
+            xssf = null;
+            file = null;
         } catch (IOException e) {
             System.out.println("Write Error");
             e.printStackTrace();
