@@ -59,7 +59,6 @@ public class DataGenerator {
                 p = null;
             }
 
-            System.gc();
             localDate = localDate.plusDays(1);
         }
         writeToXlsx(objectLists, filePath);
