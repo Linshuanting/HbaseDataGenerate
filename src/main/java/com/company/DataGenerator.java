@@ -3,10 +3,14 @@ People always move in the same direction at X and Y-axis during the whole proces
 +- 1 or 0 dot in single iteration */
 package com.company;
 
-import org.apache.poi.ss.usermodel.Cell;
+import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.TableName;
+// import org.apache.hadoop.hbase.MasterNotRunningException;
+
+// import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+// import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
@@ -14,12 +18,13 @@ import java.time.LocalDate;
 // import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
-
 //import java.lang.Thread;
+
 public class DataGenerator {
     final private static int runStep = 10;
     private static BlockData Cluster[] = new BlockData[MapGenerator.getClusterNum()];
     private static BlockData blockDatas[];
+    private static Person[] people;
     // private static int hourLimits = 12 - 8 + 18 - 13, minInterval = 10;
     // private static int minLimits = (60 - 0) / minInterval;
     private static Random random = new Random();
@@ -28,15 +33,21 @@ public class DataGenerator {
 
         final int numOfGeneration = 1000;
         LocalDate localDate = LocalDate.of(2020, 1, 1);
-        String filePath = new String("./test/data/data_from_" + localDate.toString() + ".xlsx");
+        // String filePath = new String("./test/data/data_from_" + localDate.toString()
+        // + ".xlsx");
 
         blockDatas = new BlockData[MapGenerator.getBlockSize()];
         blockDatas = (BlockData[]) readFromXlsx("./test/map/map.xlsx", blockDatas);
-        Person[] people = new Person[PeopleGenerator.getNumOfPeople()];
+        people = new Person[PeopleGenerator.getNumOfPeople()];
         people = (Person[]) readFromXlsx("./test/people/people.xlsx", people);
 
         ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(
                 runStep * PeopleGenerator.getNumOfPeople());
+
+        // Instantiating a Connection class object and table object
+        Connection connection = ConnectionFactory.createConnection();
+        Table table1 = connection.getTable(TableName.valueOf("table1"));
+        Table table2 = connection.getTable(TableName.valueOf("table2"));
 
         for (int i = 0; i < numOfGeneration; i++) {
             System.out.println("Starting generation of the " + (Integer.toString(i + 1)) + "-th day's data.");
@@ -44,6 +55,7 @@ public class DataGenerator {
                 // generateDataToPerson(p, random, blockDatas);
                 dailyForOneDay(p, random, blockDatas, localDate);
                 for (int j = 0; j < p.getArrayLength(); j++) {
+                    /** name, timestamp, placeCode, positionCode => the size of objectList is 4 */
                     ArrayList<Object> objectList = new ArrayList<Object>(4);
                     if (p.getPositionBooleans()[j]) {
                         objectList.add(0, p.getPhoneNum());
@@ -58,10 +70,17 @@ public class DataGenerator {
                 }
                 p = null;
             }
-
+            PutData1.putData(connection, table1, objectLists);
+            PutData2.putData(connection, table2, objectLists);
+            objectLists.clear();
             localDate = localDate.plusDays(1);
         }
-        writeToXlsx(objectLists, filePath);
+        // writeToXlsx(objectLists, filePath);
+
+        // Close table and connection
+        table1.close();
+        table2.close();
+        connection.close();
         return;
     }
 
@@ -123,68 +142,69 @@ public class DataGenerator {
         return null;
     }
 
-    public static void writeToXlsx(ArrayList<ArrayList<Object>> objectLists, String filePath) throws IOException {
+    // public static void writeToXlsx(ArrayList<ArrayList<Object>> objectLists,
+    // String filePath) throws IOException {
 
-        File file = new File(filePath);
-        XSSFWorkbook xssf = null;
-        SXSSFWorkbook wb = null;
-        Sheet sheet = null;
-        final int numOfPeople = PeopleGenerator.getNumOfPeople();
+    // File file = new File(filePath);
+    // XSSFWorkbook xssf = null;
+    // SXSSFWorkbook wb = null;
+    // Sheet sheet = null;
+    // final int numOfPeople = PeopleGenerator.getNumOfPeople();
 
-        // 確認檔案存在，如果存在，則向後新增
-        if (file.exists()) {
-            System.out.println("File Exists");
-            FileInputStream fileIn = new FileInputStream(filePath);
-            xssf = new XSSFWorkbook(fileIn);
-            wb = new SXSSFWorkbook(xssf);
-            sheet = wb.getSheetAt(0);
-        } else {
-            wb = new SXSSFWorkbook(runStep * numOfPeople);
-            sheet = wb.createSheet();
-        }
+    // // 確認檔案存在，如果存在，則向後新增
+    // if (file.exists()) {
+    // System.out.println("File Exists");
+    // FileInputStream fileIn = new FileInputStream(filePath);
+    // xssf = new XSSFWorkbook(fileIn);
+    // wb = new SXSSFWorkbook(xssf);
+    // sheet = wb.getSheetAt(0);
+    // } else {
+    // wb = new SXSSFWorkbook(runStep * numOfPeople);
+    // sheet = wb.createSheet();
+    // }
 
-        // name, timestamp, placeCode, positionCode
+    // // name, timestamp, placeCode, positionCode
 
-        System.out.println("Writing to xlsx file starts.");
+    // System.out.println("Writing to xlsx file starts.");
 
-        int rowNum = 0;
-        if (file.exists())
-            rowNum = xssf.getSheetAt(0).getLastRowNum() + 1;
-        int columnNum = 0;
+    // int rowNum = 0;
+    // if (file.exists())
+    // rowNum = xssf.getSheetAt(0).getLastRowNum() + 1;
+    // int columnNum = 0;
 
-        for (ArrayList<Object> list : objectLists) {
+    // for (ArrayList<Object> list : objectLists) {
 
-            Row row = sheet.createRow(rowNum++);
-            columnNum = 0;
-            for (Object object : list) {
-                Cell cell = row.createCell(columnNum++);
-                if (object instanceof String)
-                    cell.setCellValue((String) object);
-                if (object instanceof Integer)
-                    cell.setCellValue((int) object);
-                if (object instanceof Long)
-                    cell.setCellValue((Long) object);
-                if (object instanceof Boolean)
-                    cell.setCellValue((boolean) object);
-            }
-            list = null;
-        }
-        objectLists = null;
-        // 將object存入xlsx
-        FileOutputStream fileOut = new FileOutputStream(filePath);
-        try {
-            wb.write(fileOut);
-            wb.close();
-            wb = null;
-            sheet = null;
-            xssf = null;
-            file = null;
-        } catch (IOException e) {
-            System.out.println("Write Error");
-            e.printStackTrace();
-        }
-        System.out.println("Writing to XLSX file Finished ...");
-    }
+    // Row row = sheet.createRow(rowNum++);
+    // columnNum = 0;
+    // for (Object object : list) {
+    // Cell cell = row.createCell(columnNum++);
+    // if (object instanceof String)
+    // cell.setCellValue((String) object);
+    // if (object instanceof Integer)
+    // cell.setCellValue((int) object);
+    // if (object instanceof Long)
+    // cell.setCellValue((Long) object);
+    // if (object instanceof Boolean)
+    // cell.setCellValue((boolean) object);
+    // }
+    // list = null;
+    // }
+    // objectLists = null;
+    // // 將object存入xlsx
+    // FileOutputStream fileOut = new FileOutputStream(filePath);
+    // try {
+    // wb.write(fileOut);
+    // wb.close();
+    // wb = null;
+    // sheet = null;
+    // xssf = null;
+    // file = null;
+    // } catch (IOException e) {
+    // System.out.println("Write Error");
+    // e.printStackTrace();
+    // }
+    // System.out.println("Writing to XLSX file Finished ...");
+    // }
 
     // public static void generateDataToOnePerson(Person p, Random random,
     // BlockData[] blockDatas, int runStep) throws IOException{
