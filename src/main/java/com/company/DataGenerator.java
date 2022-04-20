@@ -3,6 +3,8 @@ People always move in the same direction at X and Y-axis during the whole proces
 +- 1 or 0 dot in single iteration */
 package com.company;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.TableName;
 // import org.apache.hadoop.hbase.MasterNotRunningException;
@@ -15,10 +17,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.time.LocalDate;
-// import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
-//import java.lang.Thread;
 
 public class DataGenerator {
     final private static int runStep = 10;
@@ -45,7 +45,8 @@ public class DataGenerator {
                 runStep * PeopleGenerator.getNumOfPeople());
 
         // Instantiating a Connection class object and table object
-        Connection connection = ConnectionFactory.createConnection();
+        Configuration config = HBaseConfiguration.create();
+        Connection connection = ConnectionFactory.createConnection(config);
         Table table1 = connection.getTable(TableName.valueOf("table1"));
         Table table2 = connection.getTable(TableName.valueOf("table2"));
 
@@ -81,6 +82,7 @@ public class DataGenerator {
         table1.close();
         table2.close();
         connection.close();
+        config.clear();
         return;
     }
 
