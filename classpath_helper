@@ -1,2 +1,6 @@
 #!/bin/zsh
-export CLASSPATH=./target/classes:../lib/*
+
+#export CLASSPATH=:./target/classes:../lib/*
+
+export CLASSPATH=target/HbaseDataGenerate-1.0-SNAPSHOT.jar:../lib/*:./target/classes/*
+
