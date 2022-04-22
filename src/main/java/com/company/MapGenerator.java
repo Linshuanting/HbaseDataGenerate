@@ -37,11 +37,6 @@ public class MapGenerator {
         connection.close();
     }
 
-    public static void generateMap() {
-        generateBlockData();
-        generateRandomCluster(blockSize);
-    }
-
     private static void PutMapData(Table MAP) throws IOException {
         ArrayList<Put> puts = new ArrayList<>(blockSize);
 
@@ -78,7 +73,7 @@ public class MapGenerator {
             }
             i++;
         }
-
+        blockDatas = blocks;
         scanner.close();
         return blocks;
     }

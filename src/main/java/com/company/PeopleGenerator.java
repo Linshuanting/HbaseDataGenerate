@@ -49,30 +49,30 @@ public class PeopleGenerator {
     }
 
     public static Person[] getPeople(Table PEOPLE) throws IOException {
-        Person[] people = new Person[numOfPeople];
+        Person[] persons = new Person[numOfPeople];
         Scan scan = new Scan();
         ResultScanner scanner = PEOPLE.getScanner(scan);
         NavigableMap<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> map;
 
         int i = 0;
         for (Result result : scanner) {
-            people[i] = new Person();
-            people[i].setePhoneNum(Bytes.toString(result.getRow()));
+            persons[i] = new Person();
+            persons[i].setePhoneNum(Bytes.toString(result.getRow()));
 
             map = result.getMap();
             for (Map.Entry<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> entry : map.entrySet()) {
                 for (Map.Entry<byte[], NavigableMap<Long, byte[]>> entry2 : entry.getValue().entrySet()) {
-                    people[i].setLivingPattern(Bytes.toInt(entry2.getKey()));
+                    persons[i].setLivingPattern(Bytes.toInt(entry2.getKey()));
                     for (Map.Entry<Long, byte[]> entry3 : entry2.getValue().entrySet()) {
-                        people[i].setName(Bytes.toString(entry3.getValue()));
+                        persons[i].setName(Bytes.toString(entry3.getValue()));
                     }
                 }
             }
             i++;
         }
-
+        people = persons;
         scanner.close();
-        return people;
+        return persons;
     }
 
     public static void generatePeople() {
