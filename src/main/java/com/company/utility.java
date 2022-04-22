@@ -1,46 +1,46 @@
 package com.company;
 
 // import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+// import org.apache.poi.ss.usermodel.Row;
+// import org.apache.poi.ss.usermodel.Sheet;
 // import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+// import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+// import java.io.File;
+// import java.io.FileInputStream;
+// import java.io.IOException;
 
-public class utility {
+// public class utility {
 
-    public BlockData[] readFromXlsx(String filePath) throws IOException {
-        File file = new File(filePath);
-        XSSFWorkbook xssf;
-        Sheet sheet;
-        if(file.exists()) {
-            FileInputStream fileIn = new FileInputStream(filePath);
-            xssf = new XSSFWorkbook (fileIn);
-            sheet = xssf.getSheetAt(0);
-        }
-        else {
-            IOException exception = new IOException("File Not Found!");
-            throw exception;
-        }
+//     public BlockData[] readFromXlsx(String filePath) throws IOException {
+//         File file = new File(filePath);
+//         XSSFWorkbook xssf;
+//         Sheet sheet;
+//         if(file.exists()) {
+//             FileInputStream fileIn = new FileInputStream(filePath);
+//             xssf = new XSSFWorkbook (fileIn);
+//             sheet = xssf.getSheetAt(0);
+//         }
+//         else {
+//             IOException exception = new IOException("File Not Found!");
+//             throw exception;
+//         }
 
-        int blockSize = MapGenerator.getBlockSize();
-        BlockData[] blockDatas = new BlockData[blockSize];
+//         int blockSize = MapGenerator.getBlockSize();
+//         BlockData[] blockDatas = new BlockData[blockSize];
 
-        int i = 0;
-        for (Row row : sheet) {
-            blockDatas[i] = new BlockData();
-            blockDatas[i].setPlaceCode((int) row.getCell(0).getNumericCellValue());
-            blockDatas[i].setPositionCode((long) row.getCell(1).getNumericCellValue());
-            blockDatas[i].setPositionBoolean(row.getCell(2).getBooleanCellValue());
-            i++;
-        }
-        xssf.close();
-        return blockDatas;
-    }
+//         int i = 0;
+//         for (Row row : sheet) {
+//             blockDatas[i] = new BlockData();
+//             blockDatas[i].setPlaceCode((int) row.getCell(0).getNumericCellValue());
+//             blockDatas[i].setPositionCode((long) row.getCell(1).getNumericCellValue());
+//             blockDatas[i].setPositionBoolean(row.getCell(2).getBooleanCellValue());
+//             i++;
+//         }
+//         xssf.close();
+//         return blockDatas;
+//     }
 
-}
+// }
 
 
 class pair<T1, T2>{

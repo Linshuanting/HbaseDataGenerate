@@ -10,10 +10,10 @@ import org.apache.hadoop.hbase.TableName;
 // import org.apache.hadoop.hbase.MasterNotRunningException;
 
 // import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+// import org.apache.poi.ss.usermodel.Row;
+// import org.apache.poi.ss.usermodel.Sheet;
 // import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+// import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -23,8 +23,8 @@ import java.util.Random;
 public class DataGenerator {
     final private static int runStep = 10;
     private static BlockData Cluster[] = new BlockData[MapGenerator.getClusterNum()];
-    private static BlockData blockDatas[];
-    private static Person[] people;
+    private static BlockData blockDatas[] = new BlockData[MapGenerator.getBlockSize()];
+    private static Person[] people = new Person[PeopleGenerator.getNumOfPeople()];
     // private static int hourLimits = 12 - 8 + 18 - 13, minInterval = 10;
     // private static int minLimits = (60 - 0) / minInterval;
     private static Random random = new Random();
@@ -36,10 +36,10 @@ public class DataGenerator {
         // String filePath = new String("./test/data/data_from_" + localDate.toString()
         // + ".xlsx");
 
-        blockDatas = new BlockData[MapGenerator.getBlockSize()];
-        blockDatas = (BlockData[]) readFromXlsx("./test/map/map.xlsx", blockDatas);
-        people = new Person[PeopleGenerator.getNumOfPeople()];
-        people = (Person[]) readFromXlsx("./test/people/people.xlsx", people);
+        MapGenerator.generateMap();
+        blockDatas = MapGenerator.getBlockDatas();
+        PeopleGenerator.generatePeople();
+        people = PeopleGenerator.getPeople();
 
         ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(
                 runStep * PeopleGenerator.getNumOfPeople());
@@ -88,59 +88,59 @@ public class DataGenerator {
         return runStep;
     }
 
-    public static Object[] readFromXlsx(String filePath, Object[] objects) throws IOException {
-        File file = new File(filePath);
-        XSSFWorkbook xssf;
-        Sheet sheet;
-        if (file.exists()) {
-            FileInputStream fileIn = new FileInputStream(filePath);
-            xssf = new XSSFWorkbook(fileIn);
-            sheet = xssf.getSheetAt(0);
-        } else {
-            IOException exception = new IOException("File Not Found!");
-            exception.printStackTrace();
-            throw exception;
-        }
+    // public static Object[] readFromXlsx(String filePath, Object[] objects) throws IOException {
+    //     File file = new File(filePath);
+    //     XSSFWorkbook xssf;
+    //     Sheet sheet;
+    //     if (file.exists()) {
+    //         FileInputStream fileIn = new FileInputStream(filePath);
+    //         xssf = new XSSFWorkbook(fileIn);
+    //         sheet = xssf.getSheetAt(0);
+    //     } else {
+    //         IOException exception = new IOException("File Not Found!");
+    //         exception.printStackTrace();
+    //         throw exception;
+    //     }
 
-        if (objects instanceof BlockData[]) {
-            int blockSize = MapGenerator.getBlockSize();
-            BlockData[] blockDatas = new BlockData[blockSize];
+    //     if (objects instanceof BlockData[]) {
+    //         int blockSize = MapGenerator.getBlockSize();
+    //         BlockData[] blockDatas = new BlockData[blockSize];
 
-            int i = 0, j = 0;
-            for (Row row : sheet) {
-                blockDatas[i] = new BlockData();
-                blockDatas[i].setPlaceCode((int) row.getCell(0).getNumericCellValue());
-                blockDatas[i].setPositionCode((long) row.getCell(1).getNumericCellValue());
-                blockDatas[i].setPositionBoolean(row.getCell(2).getBooleanCellValue());
-                blockDatas[i].setClusterBoolean(row.getCell(3).getBooleanCellValue());
+    //         int i = 0, j = 0;
+    //         for (Row row : sheet) {
+    //             blockDatas[i] = new BlockData();
+    //             blockDatas[i].setPlaceCode((int) row.getCell(0).getNumericCellValue());
+    //             blockDatas[i].setPositionCode((long) row.getCell(1).getNumericCellValue());
+    //             blockDatas[i].setPositionBoolean(row.getCell(2).getBooleanCellValue());
+    //             blockDatas[i].setClusterBoolean(row.getCell(3).getBooleanCellValue());
 
-                // 確定 Map 中哪些是集中點
-                if (blockDatas[i].getClusterBoolean() == true)
-                    Cluster[j++] = blockDatas[i];
+    //             // 確定 Map 中哪些是集中點
+    //             if (blockDatas[i].getClusterBoolean() == true)
+    //                 Cluster[j++] = blockDatas[i];
 
-                i++;
-            }
-            xssf.close();
-            return blockDatas;
-        } else if (objects instanceof Person[]) {
-            int numOfPeople = PeopleGenerator.getNumOfPeople();
-            Person[] people = new Person[numOfPeople];
+    //             i++;
+    //         }
+    //         xssf.close();
+    //         return blockDatas;
+    //     } else if (objects instanceof Person[]) {
+    //         int numOfPeople = PeopleGenerator.getNumOfPeople();
+    //         Person[] people = new Person[numOfPeople];
 
-            int i = 0;
-            for (Row row : sheet) {
-                people[i] = new Person();
-                people[i].setName(row.getCell(0).getStringCellValue());
-                people[i].setePhoneNum(row.getCell(1).getStringCellValue());
-                people[i].setLivingPattern((int) row.getCell(2).getNumericCellValue());
-                i++;
-            }
-            xssf.close();
-            return people;
-        }
-        xssf.close();
-        System.out.println("Error: type of " + objects + "(" + objects.getClass() + ") is not allowed.");
-        return null;
-    }
+    //         int i = 0;
+    //         for (Row row : sheet) {
+    //             people[i] = new Person();
+    //             people[i].setName(row.getCell(0).getStringCellValue());
+    //             people[i].setePhoneNum(row.getCell(1).getStringCellValue());
+    //             people[i].setLivingPattern((int) row.getCell(2).getNumericCellValue());
+    //             i++;
+    //         }
+    //         xssf.close();
+    //         return people;
+    //     }
+    //     xssf.close();
+    //     System.out.println("Error: type of " + objects + "(" + objects.getClass() + ") is not allowed.");
+    //     return null;
+    // }
 
     // public static void writeToXlsx(ArrayList<ArrayList<Object>> objectLists,
     // String filePath) throws IOException {
