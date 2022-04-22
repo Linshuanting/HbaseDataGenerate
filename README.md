@@ -2,6 +2,16 @@
 
 專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
+---
+## Compile
+```mvn package (or mvn verify)```
+
+## CLASSPATH environment variable
+```export CLASSPATH = $HBASE_HOME/lib/*```
+
+## Execute
+```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.DataGenerator```
+
 ------
 The class **BlockData in datamap.java** is moved into **DataGenerator.java** and The class **Person in datamap.java** is moved into **People.java**.
 
