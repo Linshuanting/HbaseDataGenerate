@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 
 public class PeopleGenerator {
-    final private static int numOfPeople = 1000;
+    final private static int numOfPeople = 100000;
     private static Person[] people = new Person[numOfPeople];
 
     // Generate people list

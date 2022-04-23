@@ -20,10 +20,10 @@ import java.util.Map;
 import java.util.NavigableMap;
 
 public class MapGenerator {
-    final private static int blockSize = 10000;
+    final private static int blockSize = 1000000;
     final private static int blockLength = (int) Math.sqrt(blockSize);
     private static BlockData[] blockDatas = new BlockData[blockSize];
-    private static int clusterNum = 100;
+    private static int clusterNum = blockLength;
 
     // Generate the Map
     public static void main(String[] args) throws Exception, IOException {
@@ -79,12 +79,12 @@ public class MapGenerator {
     }
 
     // 以2維陣列產生區域
-    // 地址(placeCode) 從10000開始
-    // EX. x = 2, y = 0, placeCodes = 10002
+    // 地址(placeCode) 從 0 開始
+    // EX. x = 2, y = 0, placeCodes = 2
     private static void generateBlockData() {
         Random random = new Random();
         int x = 0, y = 0;
-        int placeCode = blockSize;
+        int placeCode = 0;
 
         HashMap<Integer, Long> map = new HashMap<Integer, Long>(blockSize);
         long positionCode = 0;

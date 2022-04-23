@@ -36,42 +36,44 @@ public class DataGenerator {
         // String filePath = new String("./test/data/data_from_" + localDate.toString()
         // + ".xlsx");
 
-        
-        
         ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(
-            runStep * PeopleGenerator.getNumOfPeople());
-            
-            // Instantiating a Connection class object and table object
-            Connection connection = ConnectionFactory.createConnection();
-            Table table1 = connection.getTable(TableName.valueOf("table1"));
-            Table table2 = connection.getTable(TableName.valueOf("table2"));
-            Table MAP = connection.getTable(TableName.valueOf("MAP"));
-            Table PEOPLE = connection.getTable(TableName.valueOf("PEOPLE"));
+                runStep * PeopleGenerator.getNumOfPeople());
 
-            blockDatas = MapGenerator.getBlockDatas(MAP);
-            MapGenerator.generateRandomCluster(MapGenerator.getBlockSize());
-            /** 確定 Map 中哪些是集中點 */
-            clusterCheck();
-            people = PeopleGenerator.getPeople(PEOPLE);
-            
-            for (int i = 0; i < numOfGeneration; i++) {
+        // Instantiating a Connection class object and table object
+        Connection connection = ConnectionFactory.createConnection();
+        Table table1 = connection.getTable(TableName.valueOf("table1"));
+        Table table2 = connection.getTable(TableName.valueOf("table2"));
+        Table MAP = connection.getTable(TableName.valueOf("MAP"));
+        Table PEOPLE = connection.getTable(TableName.valueOf("PEOPLE"));
+
+        blockDatas = MapGenerator.getBlockDatas(MAP);
+        MapGenerator.generateRandomCluster(MapGenerator.getBlockSize());
+        /** 確定 Map 中哪些是集中點 */
+        clusterCheck();
+        people = PeopleGenerator.getPeople(PEOPLE);
+
+        for (int i = 0; i < numOfGeneration; i++) {
             System.out.println("Starting generation of the " + (Integer.toString(i + 1)) + "-th day's data.");
             for (Person p : people) {
                 // generateDataToPerson(p, random, blockDatas);
                 dailyForOneDay(p, random, blockDatas, localDate);
-                for (int j = 0; j < p.getArrayLength(); j++) {
-                    /** name, timestamp, placeCode, positionCode => the size of objectList is 4 */
-                    ArrayList<Object> objectList = new ArrayList<Object>(4);
-                    if (p.getPositionBooleans()[j]) {
-                        objectList.add(0, p.getPhoneNum());
-                        objectList.add(1, p.getTime()[j]);
-                        objectList.add(2, p.getPlaceCodes()[j]);
-                        objectList.add(3, p.getPositionCodes()[j]);
-                        objectLists.add(objectList);
-                    } else { // p.getPositioncodes()[i] == false. The program does not generate data to
-                             // excel.xlsx
+                try {
+                    for (int j = 0; j < p.getArrayLength(); j++) {
+                        /** name, timestamp, placeCode, positionCode => the size of objectList is 4 */
+                        ArrayList<Object> objectList = new ArrayList<Object>(4);
+                        if (p.getPositionBooleans()[j]) {
+                            objectList.add(0, p.getPhoneNum());
+                            objectList.add(1, p.getTime()[j]);
+                            objectList.add(2, p.getPlaceCodes()[j]);
+                            objectList.add(3, p.getPositionCodes()[j]);
+                            objectLists.add(objectList);
+                        } else { // p.getPositioncodes()[i] == false. The program does not generate data to
+                                 // excel.xlsx
+                        }
+                        objectList = null;
                     }
-                    objectList = null;
+                } catch (NullPointerException e) {
+                    // Do nothing
                 }
                 p = null;
             }
@@ -113,36 +115,41 @@ public class DataGenerator {
         int secondPlaceCode = Cluster[random.nextInt(blockLength)].getPlaceCode();
 
         // 判斷此人類型，並決定目標位置
-        switch (p.getLivingPattern()) {
-            /*
-             * 1 : 早八晚五型，目標相同
-             * 2 : 早八晚五型，目標不同
-             * 3 : 早八晚五型，無活動
-             * 4 : 早八午十二，單目標
-             * 5 : 午十二晚五，單目標
-             * 6 : 活動時間與路徑相對隨機
-             */
-            case 1:
-                secondPlaceCode = firstPlaceCode;
-                break;
-            case 2:
-                break;
-            case 3:
-                firstPlaceCode = 0;
-                secondPlaceCode = 0;
-                break;
-            case 4:
-                secondPlaceCode = 0;
-                break;
-            case 5:
-                firstPlaceCode = 0;
-                break;
-            case 6:
-                firstPlaceCode = -1;
-                secondPlaceCode = -1;
-                break;
-            default:
-                System.out.println("-------Not correct Living Pattern-------");
+        try {
+            switch (p.getLivingPattern()) {
+                /*
+                 * 1 : 早八晚五型，目標相同
+                 * 2 : 早八晚五型，目標不同
+                 * 3 : 早八晚五型，無活動
+                 * 4 : 早八午十二，單目標
+                 * 5 : 午十二晚五，單目標
+                 * 6 : 活動時間與路徑相對隨機
+                 */
+                case 1:
+                    secondPlaceCode = firstPlaceCode;
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    firstPlaceCode = 0;
+                    secondPlaceCode = 0;
+                    break;
+                case 4:
+                    secondPlaceCode = 0;
+                    break;
+                case 5:
+                    firstPlaceCode = 0;
+                    break;
+                case 6:
+                    firstPlaceCode = -1;
+                    secondPlaceCode = -1;
+                    break;
+                default:
+                    System.out.println("-------Not correct Living Pattern-------");
+            }
+        } catch (NullPointerException e) {
+            // Do nothing
+            return;
         }
 
         // 決定好起始點以及終點

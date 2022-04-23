@@ -7,11 +7,12 @@
 ```mvn package (or mvn verify)```
 
 ## CLASSPATH environment variable
-```export CLASSPATH = $HBASE_HOME/lib/*```
+```export CLASSPATH=$HBASE_HOME/lib/*```
 
 ## Execute
 ```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.DataGenerator```
-
+```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.MapGenerator```
+```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.PeopleGenerator```
 ------
 The class **BlockData in datamap.java** is moved into **DataGenerator.java** and The class **Person in datamap.java** is moved into **People.java**.
 
@@ -23,7 +24,7 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
 
 **test/data/data_from_1-1.xlsx is the sample data generated from DataGenerator.java**
 
-地圖改為100*100，有1000個人走訪地圖。
+地圖改為1000*1000，有100000個人走訪地圖。
 
 ---
 ![](/../patch-1/assets/DefinitionOfLivingPattern.jpg)
