@@ -224,9 +224,9 @@ public class DataGenerator {
 
         int pos = getPositionFromPair(XY);
 
-        if (pos > 10000) {
-            System.out.println(pos);
-        }
+        // if (pos > 10000) {
+        //     System.out.println(pos);
+        // }
         // 時間細節設定
         String time = getTime(date, hour, min);
 
