@@ -1,27 +1,78 @@
 package com.company;
+// Schema of 'MAP'
+
+// Row key: phone number (String), cf: liv, cq: living pattern (int), value: name (string)
 
 // import org.apache.poi.ss.usermodel.Cell;
 // import org.apache.poi.ss.usermodel.Row;
 // import org.apache.poi.ss.usermodel.Sheet;
 // import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.TableName;
 
 import java.util.Random;
 import java.util.HashMap;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.NavigableMap;
 
 public class PeopleGenerator {
     final private static int numOfPeople = 1000;
     private static Person[] people = new Person[numOfPeople];
 
     // Generate people list
-    // public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
+        Connection connection = ConnectionFactory.createConnection();
+        Table PEOPLE = connection.getTable(TableName.valueOf("PEOPLE"));
 
-    // writeToXlsx("./test/people/people.xlsx");
-    // return;
-    // }
+        generatePeople();
+        PutPeopleData(PEOPLE);
 
-    public static Person[] getPeople() {
-        return people;
+        PEOPLE.close();
+        connection.close();
+    }
+
+    private static void PutPeopleData(Table PEOPLE) throws IOException {
+        ArrayList<Put> puts = new ArrayList<>(numOfPeople);
+
+        for (Person person : people) {
+            Put put = new Put(Bytes.toBytes(person.getPhoneNum()));
+            put.addColumn(Bytes.toBytes("liv"), Bytes.toBytes(person.getLivingPattern()),
+                    Bytes.toBytes(person.getName()));
+            puts.add(put);
+            put = null;
+        }
+        PEOPLE.put(puts);
+        System.out.println("Data was inserted Successfully");
+    }
+
+    public static Person[] getPeople(Table PEOPLE) throws IOException {
+        Person[] persons = new Person[numOfPeople];
+        Scan scan = new Scan();
+        ResultScanner scanner = PEOPLE.getScanner(scan);
+        NavigableMap<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> map;
+
+        int i = 0;
+        for (Result result : scanner) {
+            persons[i] = new Person();
+            persons[i].setePhoneNum(Bytes.toString(result.getRow()));
+
+            map = result.getMap();
+            for (Map.Entry<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> entry : map.entrySet()) {
+                for (Map.Entry<byte[], NavigableMap<Long, byte[]>> entry2 : entry.getValue().entrySet()) {
+                    persons[i].setLivingPattern(Bytes.toInt(entry2.getKey()));
+                    for (Map.Entry<Long, byte[]> entry3 : entry2.getValue().entrySet()) {
+                        persons[i].setName(Bytes.toString(entry3.getValue()));
+                    }
+                }
+            }
+            i++;
+        }
+        people = persons;
+        scanner.close();
+        return persons;
     }
 
     public static void generatePeople() {

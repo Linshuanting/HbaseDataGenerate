@@ -5,9 +5,9 @@ package com.company;
 
 // import org.apache.hadoop.conf.Configuration;
 // import org.apache.hadoop.hbase.HBaseConfiguration;
+// import org.apache.hadoop.hbase.MasterNotRunningException;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.TableName;
-// import org.apache.hadoop.hbase.MasterNotRunningException;
 
 // import org.apache.poi.ss.usermodel.Cell;
 // import org.apache.poi.ss.usermodel.Row;
@@ -36,20 +36,25 @@ public class DataGenerator {
         // String filePath = new String("./test/data/data_from_" + localDate.toString()
         // + ".xlsx");
 
-        MapGenerator.generateMap();
-        blockDatas = MapGenerator.getBlockDatas();
-        PeopleGenerator.generatePeople();
-        people = PeopleGenerator.getPeople();
-
+        
+        
         ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(
-                runStep * PeopleGenerator.getNumOfPeople());
+            runStep * PeopleGenerator.getNumOfPeople());
+            
+            // Instantiating a Connection class object and table object
+            Connection connection = ConnectionFactory.createConnection();
+            Table table1 = connection.getTable(TableName.valueOf("table1"));
+            Table table2 = connection.getTable(TableName.valueOf("table2"));
+            Table MAP = connection.getTable(TableName.valueOf("MAP"));
+            Table PEOPLE = connection.getTable(TableName.valueOf("PEOPLE"));
 
-        // Instantiating a Connection class object and table object
-        Connection connection = ConnectionFactory.createConnection();
-        Table table1 = connection.getTable(TableName.valueOf("table1"));
-        Table table2 = connection.getTable(TableName.valueOf("table2"));
-
-        for (int i = 0; i < numOfGeneration; i++) {
+            blockDatas = MapGenerator.getBlockDatas(MAP);
+            MapGenerator.generateRandomCluster(MapGenerator.getBlockSize());
+            /** 確定 Map 中哪些是集中點 */
+            clusterCheck();
+            people = PeopleGenerator.getPeople(PEOPLE);
+            
+            for (int i = 0; i < numOfGeneration; i++) {
             System.out.println("Starting generation of the " + (Integer.toString(i + 1)) + "-th day's data.");
             for (Person p : people) {
                 // generateDataToPerson(p, random, blockDatas);
@@ -78,6 +83,8 @@ public class DataGenerator {
         // writeToXlsx(objectLists, filePath);
 
         // Close table and connection
+        MAP.close();
+        PEOPLE.close();
         table1.close();
         table2.close();
         connection.close();
@@ -88,131 +95,16 @@ public class DataGenerator {
         return runStep;
     }
 
-    // public static Object[] readFromXlsx(String filePath, Object[] objects) throws IOException {
-    //     File file = new File(filePath);
-    //     XSSFWorkbook xssf;
-    //     Sheet sheet;
-    //     if (file.exists()) {
-    //         FileInputStream fileIn = new FileInputStream(filePath);
-    //         xssf = new XSSFWorkbook(fileIn);
-    //         sheet = xssf.getSheetAt(0);
-    //     } else {
-    //         IOException exception = new IOException("File Not Found!");
-    //         exception.printStackTrace();
-    //         throw exception;
-    //     }
-
-    //     if (objects instanceof BlockData[]) {
-    //         int blockSize = MapGenerator.getBlockSize();
-    //         BlockData[] blockDatas = new BlockData[blockSize];
-
-    //         int i = 0, j = 0;
-    //         for (Row row : sheet) {
-    //             blockDatas[i] = new BlockData();
-    //             blockDatas[i].setPlaceCode((int) row.getCell(0).getNumericCellValue());
-    //             blockDatas[i].setPositionCode((long) row.getCell(1).getNumericCellValue());
-    //             blockDatas[i].setPositionBoolean(row.getCell(2).getBooleanCellValue());
-    //             blockDatas[i].setClusterBoolean(row.getCell(3).getBooleanCellValue());
-
-    //             // 確定 Map 中哪些是集中點
-    //             if (blockDatas[i].getClusterBoolean() == true)
-    //                 Cluster[j++] = blockDatas[i];
-
-    //             i++;
-    //         }
-    //         xssf.close();
-    //         return blockDatas;
-    //     } else if (objects instanceof Person[]) {
-    //         int numOfPeople = PeopleGenerator.getNumOfPeople();
-    //         Person[] people = new Person[numOfPeople];
-
-    //         int i = 0;
-    //         for (Row row : sheet) {
-    //             people[i] = new Person();
-    //             people[i].setName(row.getCell(0).getStringCellValue());
-    //             people[i].setePhoneNum(row.getCell(1).getStringCellValue());
-    //             people[i].setLivingPattern((int) row.getCell(2).getNumericCellValue());
-    //             i++;
-    //         }
-    //         xssf.close();
-    //         return people;
-    //     }
-    //     xssf.close();
-    //     System.out.println("Error: type of " + objects + "(" + objects.getClass() + ") is not allowed.");
-    //     return null;
-    // }
-
-    // public static void writeToXlsx(ArrayList<ArrayList<Object>> objectLists,
-    // String filePath) throws IOException {
-
-    // File file = new File(filePath);
-    // XSSFWorkbook xssf = null;
-    // SXSSFWorkbook wb = null;
-    // Sheet sheet = null;
-    // final int numOfPeople = PeopleGenerator.getNumOfPeople();
-
-    // // 確認檔案存在，如果存在，則向後新增
-    // if (file.exists()) {
-    // System.out.println("File Exists");
-    // FileInputStream fileIn = new FileInputStream(filePath);
-    // xssf = new XSSFWorkbook(fileIn);
-    // wb = new SXSSFWorkbook(xssf);
-    // sheet = wb.getSheetAt(0);
-    // } else {
-    // wb = new SXSSFWorkbook(runStep * numOfPeople);
-    // sheet = wb.createSheet();
-    // }
-
-    // // name, timestamp, placeCode, positionCode
-
-    // System.out.println("Writing to xlsx file starts.");
-
-    // int rowNum = 0;
-    // if (file.exists())
-    // rowNum = xssf.getSheetAt(0).getLastRowNum() + 1;
-    // int columnNum = 0;
-
-    // for (ArrayList<Object> list : objectLists) {
-
-    // Row row = sheet.createRow(rowNum++);
-    // columnNum = 0;
-    // for (Object object : list) {
-    // Cell cell = row.createCell(columnNum++);
-    // if (object instanceof String)
-    // cell.setCellValue((String) object);
-    // if (object instanceof Integer)
-    // cell.setCellValue((int) object);
-    // if (object instanceof Long)
-    // cell.setCellValue((Long) object);
-    // if (object instanceof Boolean)
-    // cell.setCellValue((boolean) object);
-    // }
-    // list = null;
-    // }
-    // objectLists = null;
-    // // 將object存入xlsx
-    // FileOutputStream fileOut = new FileOutputStream(filePath);
-    // try {
-    // wb.write(fileOut);
-    // wb.close();
-    // wb = null;
-    // sheet = null;
-    // xssf = null;
-    // file = null;
-    // } catch (IOException e) {
-    // System.out.println("Write Error");
-    // e.printStackTrace();
-    // }
-    // System.out.println("Writing to XLSX file Finished ...");
-    // }
-
-    // public static void generateDataToOnePerson(Person p, Random random,
-    // BlockData[] blockDatas, int runStep) throws IOException{
-    // int blockLength = MapGenerator.getBlockLength();
-    // runMode runMode = new runMode(blockLength);
-    // pair<Integer, Integer> startPos = new pair<Integer,
-    // Integer>(random.nextInt(blockLength), random.nextInt(blockLength));
-    // }
+    private static void clusterCheck() {
+        int j = 0;
+        for (int i = 0; i < MapGenerator.getBlockSize(); i++) {
+            // 確定 Map 中哪些是集中點
+            if (blockDatas[i].getClusterBoolean() == true) {
+                Cluster[j] = blockDatas[i];
+                j++;
+            }
+        }
+    }
 
     public static void dailyForOneDay(Person p, Random random, BlockData[] blockDatas, LocalDate localDate) {
         int blockLength = MapGenerator.getBlockLength();
@@ -538,4 +430,133 @@ public class DataGenerator {
         }
         return location;
     }
+
+    // public static Object[] readFromXlsx(String filePath, Object[] objects) throws
+    // IOException {
+    // File file = new File(filePath);
+    // XSSFWorkbook xssf;
+    // Sheet sheet;
+    // if (file.exists()) {
+    // FileInputStream fileIn = new FileInputStream(filePath);
+    // xssf = new XSSFWorkbook(fileIn);
+    // sheet = xssf.getSheetAt(0);
+    // } else {
+    // IOException exception = new IOException("File Not Found!");
+    // exception.printStackTrace();
+    // throw exception;
+    // }
+
+    // if (objects instanceof BlockData[]) {
+    // int blockSize = MapGenerator.getBlockSize();
+    // BlockData[] blockDatas = new BlockData[blockSize];
+
+    // int i = 0, j = 0;
+    // for (Row row : sheet) {
+    // blockDatas[i] = new BlockData();
+    // blockDatas[i].setPlaceCode((int) row.getCell(0).getNumericCellValue());
+    // blockDatas[i].setPositionCode((long) row.getCell(1).getNumericCellValue());
+    // blockDatas[i].setPositionBoolean(row.getCell(2).getBooleanCellValue());
+    // blockDatas[i].setClusterBoolean(row.getCell(3).getBooleanCellValue());
+
+    // // 確定 Map 中哪些是集中點
+    // if (blockDatas[i].getClusterBoolean() == true)
+    // Cluster[j++] = blockDatas[i];
+
+    // i++;
+    // }
+
+    // xssf.close();
+    // return blockDatas;
+    // } else if (objects instanceof Person[]) {
+    // int numOfPeople = PeopleGenerator.getNumOfPeople();
+    // Person[] people = new Person[numOfPeople];
+
+    // int i = 0;
+    // for (Row row : sheet) {
+    // people[i] = new Person();
+    // people[i].setName(row.getCell(0).getStringCellValue());
+    // people[i].setePhoneNum(row.getCell(1).getStringCellValue());
+    // people[i].setLivingPattern((int) row.getCell(2).getNumericCellValue());
+    // i++;
+    // }
+    // xssf.close();
+    // return people;
+    // }
+    // xssf.close();
+    // System.out.println("Error: type of " + objects + "(" + objects.getClass() +
+    // ") is not allowed.");
+    // return null;
+    // }
+
+    // public static void writeToXlsx(ArrayList<ArrayList<Object>> objectLists,
+    // String filePath) throws IOException {
+
+    // File file = new File(filePath);
+    // XSSFWorkbook xssf = null;
+    // SXSSFWorkbook wb = null;
+    // Sheet sheet = null;
+    // final int numOfPeople = PeopleGenerator.getNumOfPeople();
+
+    // // 確認檔案存在，如果存在，則向後新增
+    // if (file.exists()) {
+    // System.out.println("File Exists");
+    // FileInputStream fileIn = new FileInputStream(filePath);
+    // xssf = new XSSFWorkbook(fileIn);
+    // wb = new SXSSFWorkbook(xssf);
+    // sheet = wb.getSheetAt(0);
+    // } else {
+    // wb = new SXSSFWorkbook(runStep * numOfPeople);
+    // sheet = wb.createSheet();
+    // }
+
+    // // name, timestamp, placeCode, positionCode
+
+    // System.out.println("Writing to xlsx file starts.");
+
+    // int rowNum = 0;
+    // if (file.exists())
+    // rowNum = xssf.getSheetAt(0).getLastRowNum() + 1;
+    // int columnNum = 0;
+
+    // for (ArrayList<Object> list : objectLists) {
+
+    // Row row = sheet.createRow(rowNum++);
+    // columnNum = 0;
+    // for (Object object : list) {
+    // Cell cell = row.createCell(columnNum++);
+    // if (object instanceof String)
+    // cell.setCellValue((String) object);
+    // if (object instanceof Integer)
+    // cell.setCellValue((int) object);
+    // if (object instanceof Long)
+    // cell.setCellValue((Long) object);
+    // if (object instanceof Boolean)
+    // cell.setCellValue((boolean) object);
+    // }
+    // list = null;
+    // }
+    // objectLists = null;
+    // // 將object存入xlsx
+    // FileOutputStream fileOut = new FileOutputStream(filePath);
+    // try {
+    // wb.write(fileOut);
+    // wb.close();
+    // wb = null;
+    // sheet = null;
+    // xssf = null;
+    // file = null;
+    // } catch (IOException e) {
+    // System.out.println("Write Error");
+    // e.printStackTrace();
+    // }
+    // System.out.println("Writing to XLSX file Finished ...");
+    // }
+
+    // public static void generateDataToOnePerson(Person p, Random random,
+    // BlockData[] blockDatas, int runStep) throws IOException{
+    // int blockLength = MapGenerator.getBlockLength();
+    // runMode runMode = new runMode(blockLength);
+    // pair<Integer, Integer> startPos = new pair<Integer,
+    // Integer>(random.nextInt(blockLength), random.nextInt(blockLength));
+    // }
 }
