@@ -53,6 +53,8 @@ public class DataGenerator {
         people = PeopleGenerator.getPeople(PEOPLE);
 
         for (int i = 0; i < numOfGeneration; i++) {
+            if (i % 100 == 0)
+                System.gc();
             System.out.println("Starting generation of the " + (Integer.toString(i + 1)) + "-th day's data.");
             for (Person p : people) {
                 // generateDataToPerson(p, random, blockDatas);

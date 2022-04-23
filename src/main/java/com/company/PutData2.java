@@ -52,37 +52,6 @@ public class PutData2 {
     // connection.close();
     // }
 
-    // private static void readFromXlsx(String filePath) throws IOException {
-    // File file = new File(filePath);
-    // XSSFWorkbook xssf;
-    // Sheet sheet;
-    // if (file.exists()) {
-    // FileInputStream fileIn = new FileInputStream(filePath);
-    // xssf = new XSSFWorkbook(fileIn);
-    // sheet = xssf.getSheetAt(0);
-    // } else {
-    // IOException exception = new IOException("File Not Found!");
-    // exception.printStackTrace();
-    // throw exception;
-    // }
-
-    // final int second2Milli = 1000;
-    // for (Row row : sheet) {
-    // sizeOfList++;
-    // phoneNums.add(row.getCell(0).getStringCellValue()); // phone numbers
-    // LocalDateTime dateTime =
-    // LocalDateTime.parse(row.getCell(1).getStringCellValue()); // date time
-    // ts.add(dateTime.toEpochSecond(ZoneOffset.of("+08:00")) * second2Milli);
-    // placeCodes.add((int) row.getCell(2).getNumericCellValue());
-    // positionCodes.add((long) row.getCell(3).getNumericCellValue());
-
-    // dateTime = null;
-    // row = null;
-    // }
-    // sheet = null;
-    // xssf.close();
-    // }
-
     public static void putData(Connection connection, Table table, ArrayList<ArrayList<Object>> objectLists)
             throws IOException {
         ArrayList<Put> puts = new ArrayList<>(objectLists.size());
@@ -93,7 +62,7 @@ public class PutData2 {
             dateTime = LocalDateTime.parse(time);
             long ts = dateTime.toEpochSecond(ZoneOffset.of("+08:00")) * second2Milli;
 
-            Put put = new Put(Bytes.toBytes((int) list.get(2)));
+            Put put = new Put(Bytes.toBytes(Integer.toString((int) list.get(2))));
             put.addColumn(Bytes.toBytes("pho"), Bytes.toBytes((String) list.get(0)), ts,
                     Bytes.toBytes((long) list.get(3)));
             puts.add(put);
