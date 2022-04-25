@@ -19,16 +19,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 public class PutData2 {
     private static final int second2Milli = 1000;
-    // private static final int initialCapacity = 10000;
-    // private static ArrayList<String> phoneNums = new
-    // ArrayList<>(initialCapacity);
-    // private static ArrayList<Long> ts = new ArrayList<>(initialCapacity);
-    // private static ArrayList<Integer> placeCodes = new
-    // ArrayList<>(initialCapacity);
-    // private static ArrayList<Long> positionCodes = new
-    // ArrayList<>(initialCapacity);
-    // private static int sizeOfList;
-
+    
     // public static void main(String[] args) throws MasterNotRunningException,
     // IOException {
     // // Instantiating a Connection class object and table object

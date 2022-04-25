@@ -2,14 +2,13 @@
 
 專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
----
-## Compile
+## Compilation
 ```mvn package (or mvn verify)```
 
 ## CLASSPATH environment variable
 ```export CLASSPATH=$HBASE_HOME/lib/*```
 
-## Execute
+## Execution
 ```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.DataGenerator```
 
 ```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.MapGenerator```
@@ -28,27 +27,3 @@ The class **BlockData in datamap.java** is moved into **DataGenerator.java** and
 **test/data/data_from_1-1.xlsx is the sample data generated from DataGenerator.java**
 
 地圖改為1000*1000，有100000個人走訪地圖。
-
----
-![](/../patch-1/assets/DefinitionOfLivingPattern.jpg)
-
-```
-/* Definiton of living pattern
-    1 : 白天活動，活動路線固定
-    3 : 白天活動，路線不固定
-    2 : 晚上活動，路線固定
-    3 : 晚上活動，路線不固定
-    4 : 白天夜晚都會活動，路線固定
-    5 : 白天夜晚都會活動，路線不固定
-    6 : 活動時間與路徑相對隨機
-    
-    更改成
-    1 : 早八晚五型，目標相同
-    2 : 早八晚五型，目標不同
-    3 : 早八晚五型，無活動
-    4 : 早八午十二，單目標
-    5 : 午十二晚五，單目標
-    6 : 活動時間與路徑相對隨機 
-*/
-```
----

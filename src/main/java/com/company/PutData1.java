@@ -43,7 +43,6 @@ public class PutData1 {
     // connection.close();
     // }
 
-
     public static void putData(Connection connection, Table table, ArrayList<ArrayList<Object>> objectLists)
             throws IOException {
         ArrayList<Put> puts = new ArrayList<>(objectLists.size());
