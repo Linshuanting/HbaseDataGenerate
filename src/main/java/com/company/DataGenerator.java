@@ -6,8 +6,11 @@ package com.company;
 // import org.apache.hadoop.conf.Configuration;
 // import org.apache.hadoop.hbase.HBaseConfiguration;
 // import org.apache.hadoop.hbase.MasterNotRunningException;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.TableName;
+import com.tools.HbaseTools;
 
 // import org.apache.poi.ss.usermodel.Cell;
 // import org.apache.poi.ss.usermodel.Row;
@@ -29,6 +32,21 @@ public class DataGenerator {
     // private static int minLimits = (60 - 0) / minInterval;
     private static Random random = new Random();
 
+
+    // 新增需要連接到Hbase的設定
+    private static Configuration configuration = null;
+    private static HbaseTools HF;
+
+    static {
+
+        configuration = HBaseConfiguration.create();
+        configuration.set("hbase.zookeeper.quorum", "140.115.52.28");
+        configuration.set("zookeeper.znode.parent", "/master");
+        HF = new HbaseTools();
+        HF.setDataConfig(configuration);
+
+    }
+
     public static void main(String[] args) throws Exception, IOException {
 
         final int numOfGeneration = 1000;
@@ -39,10 +57,13 @@ public class DataGenerator {
         ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(
                 runStep * PeopleGenerator.getNumOfPeople());
 
+        // 在此建立 table 來放資料
+        createAllTable();
+
         // Instantiating a Connection class object and table object
         Connection connection = ConnectionFactory.createConnection();
-        Table table1 = connection.getTable(TableName.valueOf("table1"));
-        Table table2 = connection.getTable(TableName.valueOf("table2"));
+        //Table table1 = connection.getTable(TableName.valueOf("table1"));
+        //Table table2 = connection.getTable(TableName.valueOf("table2"));
         Table MAP = connection.getTable(TableName.valueOf("MAP"));
         Table PEOPLE = connection.getTable(TableName.valueOf("PEOPLE"));
 
@@ -79,8 +100,13 @@ public class DataGenerator {
                 }
                 p = null;
             }
-            PutData1.putData(connection, table1, objectLists);
-            PutData2.putData(connection, table2, objectLists);
+            //PutData1.putData(connection, table1, objectLists);
+            //PutData2.putData(connection, table2, objectLists);
+
+            PutData1.putData(HF, "table1", objectLists);
+            PutData2.putData(HF, "table2", objectLists);
+            PutData3.putData(HF, "table3", objectLists);
+
             objectLists.clear();
             localDate = localDate.plusDays(1);
         }
@@ -89,10 +115,23 @@ public class DataGenerator {
         // Close table and connection
         MAP.close();
         PEOPLE.close();
-        table1.close();
-        table2.close();
+        //table1.close();
+        //table2.close();
         connection.close();
         return;
+    }
+
+    // 建立所有需要用到的table
+    public static void createAllTable() throws IOException {
+        // 建立table，並放入 splitKeys
+        String [] arr = new String[]{"000|", "001|", "002|", "003|", "004|", "005|", "006|", "007|"};
+        HF.createTable("table1", arr,"All_of_the_time");
+
+        String [] arr2 = new String[]{"100|", "101|", "102|", "103|", "104|", "105|", "106|", "107|"};
+        HF.createTable("table2", "People");
+
+        String [] arr3 = new String[]{"200|", "201|", "202|", "203|", "204|", "205|", "206|", "207|"};
+        HF.createTable("table3", "All_position_time");
     }
 
     public static final int getRunStep() {

@@ -3,12 +3,14 @@ package com.company;
 // Schema of 'table2'
 // | 2nd | location | phone_numbers(VERSIONS => 100) | phone number | position code |
 import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 
 // import org.apache.hadoop.hbase.TableName;
 // import org.apache.hadoop.hbase.MasterNotRunningException;
+import com.tools.HbaseTools;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 // import org.apache.poi.ss.usermodel.Cell;
@@ -19,38 +21,72 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 public class PutData2 {
     private static final int second2Milli = 1000;
-    // private static final int initialCapacity = 10000;
-    // private static ArrayList<String> phoneNums = new
-    // ArrayList<>(initialCapacity);
-    // private static ArrayList<Long> ts = new ArrayList<>(initialCapacity);
-    // private static ArrayList<Integer> placeCodes = new
-    // ArrayList<>(initialCapacity);
-    // private static ArrayList<Long> positionCodes = new
-    // ArrayList<>(initialCapacity);
-    // private static int sizeOfList;
+    private static String ColumnFamily = "People";
 
-    // public static void main(String[] args) throws MasterNotRunningException,
-    // IOException {
-    // // Instantiating a Connection class object and table object
-    // Connection connection = ConnectionFactory.createConnection();
-    // Table table = connection.getTable(TableName.valueOf("table2"));
-    // sizeOfList = 0;
-    // final int numOfInFiles = 4;
-    // for (int i = 0; i < numOfInFiles; i++) {
-    // readFromXlsx("/home/shang/repo/myHBaseProject/HbaseDataGenerate/test/data/data_from_1-"
-    // + Integer.toString(1 + (i * 7)) + "_sorted.xlsx");
-    // }
+    public static void putData(HbaseTools hf, String tableName, ArrayList<ArrayList<Object>> objectLists) throws IOException {
 
-    // ArrayList<Put> puts = new ArrayList<>(sizeOfList);
-    // putData(puts);
+        for (ArrayList<Object> list : objectLists){
 
-    // table.put(puts);
-    // System.out.println("Data was inserted Successfully");
+            // 取得rowKey (rk: xxx_placecode_time)
+            String time = (String)list.get(1);
+            String placecode = Integer.toString((int)list.get(2));
+            String rowKey = getRowKey(placecode, time);
 
-    // // Close table and connection
-    // table.close();
-    // connection.close();
-    // }
+
+            // 取得需要存入的時間 (cq: phonenum)
+            String phonenum = (String) list.get(0);
+
+
+            long stamp_time = getStampTime(time);
+
+            // 取得 person (value: null)
+            String value = "";
+
+            hf.putData(tableName, rowKey, ColumnFamily, phonenum, value);
+
+        }
+
+        System.out.println("======= Finish Put Table 02 ========");
+
+    }
+
+    // 測試用
+    public static void main(String[] args) {
+        LocalDate d = LocalDate.now();
+
+        String time = DataGenerator.getTime(d,10,5);
+
+        System.out.println(time);
+
+    }
+
+    // 取得要求rowkey: xxx_placeCode_time
+    public static String getRowKey(String pos, String time){
+
+        String row_key_arr [] = new String[]{"100", "101", "102", "103", "104", "105", "106", "107", "108"};
+
+        // 取得 int 版本 placecode 之後需要做運算
+        int pcode = Integer.parseInt(pos);
+
+        // 取得 int 版本 year-month 之後做運算
+        String year_month = time.substring(0, 4) + time.substring(5, 7);
+        int t = Integer.parseInt(year_month);
+
+        // 分配 rowkey_xxx
+        int remainder = (pcode ^ t) % 9;
+
+        String ans = row_key_arr[remainder] + "_" + pos + "_" + time;
+
+        return ans;
+    }
+
+    private static long getStampTime(String time){
+
+        LocalDateTime dateTime = LocalDateTime.parse(time);
+        long ts = dateTime.toEpochSecond(ZoneOffset.of("+08:00")) * second2Milli;
+        return  ts;
+
+    }
 
     public static void putData(Connection connection, Table table, ArrayList<ArrayList<Object>> objectLists)
             throws IOException {
@@ -69,15 +105,6 @@ public class PutData2 {
 
             put = null;
         }
-
-        // for (int i = 0; i < sizeOfList; i++) {
-        // Put put = new Put(Bytes.toBytes(placeCodes.get(i)));
-        // put.addColumn(Bytes.toBytes("pho"), Bytes.toBytes(phoneNums.get(i)),
-        // ts.get(i),
-        // Bytes.toBytes(positionCodes.get(i)));
-        // puts.add(put);
-        // put = null;
-        // }
 
         table.put(puts);
         System.out.println("Data was inserted Successfully");
