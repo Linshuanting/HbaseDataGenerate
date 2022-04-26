@@ -39,7 +39,7 @@ public class PutData1 {
             // 取得placeCode (value: placeCode)
             String pc = Integer.toString((int) list.get(2));
 
-            hf.putData(tableName, rowKey, ColumnFamily, time, pc);
+            hf.putData(tableName, rowKey, ColumnFamily, time, stamp_time, pc);
 
         }
 

@@ -27,7 +27,11 @@ public class PutData3 {
             // 取得 person (value: phonenum)
             String phonenum = (String) list.get(0);
 
-            hf.putData(tableName, rowKey, ColumnFamily, time, phonenum);
+            // 這裡的time存入不需要存入完整time，簡化一點方便找資料，也方便尋找可能染疫者
+            // time：2022-04-30T00
+            time = time.substring(0, 13);
+
+            hf.putData(tableName, rowKey, ColumnFamily, time, stamp_time, phonenum);
 
         }
 

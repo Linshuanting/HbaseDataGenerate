@@ -33,7 +33,7 @@ public class PutData2 {
             String rowKey = getRowKey(placecode, time);
 
 
-            // 取得需要存入的時間 (cq: phonenum)
+            // 取得 phonenum 當作 column qualifier (cq: phonenum)
             String phonenum = (String) list.get(0);
 
 
@@ -42,7 +42,7 @@ public class PutData2 {
             // 取得 person (value: null)
             String value = "";
 
-            hf.putData(tableName, rowKey, ColumnFamily, phonenum, value);
+            hf.putData(tableName, rowKey, ColumnFamily, phonenum, stamp_time,value);
 
         }
 
@@ -55,8 +55,14 @@ public class PutData2 {
         LocalDate d = LocalDate.now();
 
         String time = DataGenerator.getTime(d,10,5);
+        String time2 = "2022-04-30T00:00:00";
+        long ts = getStampTime(time);
+        long ts2 = getStampTime(time2);
 
         System.out.println(time);
+        System.out.println(ts);
+        System.out.println(time2);
+        System.out.println(ts2);
 
     }
 
@@ -75,7 +81,8 @@ public class PutData2 {
         // 分配 rowkey_xxx
         int remainder = (pcode ^ t) % 9;
 
-        String ans = row_key_arr[remainder] + "_" + pos + "_" + time;
+        // 取時間長度時，因為要放在rowkey中，需要方便的拿出來，故設計到 2022-04-30T00，來方便統一
+        String ans = row_key_arr[remainder] + "_" + pos + "_" + time.substring(0, 13);
 
         return ans;
     }

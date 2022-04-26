@@ -11,6 +11,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 此為hbase增刪改查使用工具
  */
 
+import javax.inject.Qualifier;
 import java.io.IOException;
 
 public class HbaseTools {
@@ -49,6 +50,28 @@ public class HbaseTools {
 
         // 添加數據
         put.addColumn(Bytes.toBytes(cF), Bytes.toBytes(cN), Bytes.toBytes(value));
+
+        // 執行添加操作
+        table.put(put);
+
+        // System.out.println("已完成添加");
+
+        table.close();
+
+        return;
+    }
+
+    // 增、改
+    public void putData(String tableName, String rowKey, String cF, String cN, long timeStamp, String value) throws IOException {
+
+        // 獲取表對象
+        Table table = connection.getTable(TableName.valueOf(tableName));
+
+        // 創建put對象
+        Put put = new Put(Bytes.toBytes(rowKey));
+
+        // 添加數據
+        put.addColumn(Bytes.toBytes(cF), Bytes.toBytes(cN), timeStamp, Bytes.toBytes(value));
 
         // 執行添加操作
         table.put(put);
@@ -215,7 +238,7 @@ public class HbaseTools {
         System.out.println("表已刪除");
     }
 
-    // 查詢數ｆ據
+    // 查詢數據
     // 獲取指定column
     public void getData(String tableName, String rowKey, String cF, String cN) throws IOException {
 
@@ -225,18 +248,137 @@ public class HbaseTools {
         // 創建一個Get對象
         Get get = new Get(Bytes.toBytes(rowKey));
         get.addColumn(Bytes.toBytes(cF), Bytes.toBytes(cN));
-        get.readAllVersions();
+        // get.readAllVersions();
 
         // 獲取數據的操作
         Result result = table.get(get);
         Cell[] cells = result.rawCells();
         for (Cell cell : cells) {
-            System.out.println("RK:" + Bytes.toString(CellUtil.cloneRow(cell))
-                    + ", CF:" + Bytes.toString(CellUtil.cloneFamily(cell))
-                    + ", CN:" + Bytes.toString(CellUtil.cloneQualifier(cell))
-                    + ", VALUE:" + Bytes.toString(CellUtil.cloneValue(cell)));
+            printfCell(cell);
         }
     }
+
+    // 根據只指定 RK & CF，獲取 範圍內的 column
+    public void getData(String tableName, String rowKey, String cF) throws IOException {
+
+        // 獲取表對象
+        Table table = connection.getTable(TableName.valueOf(tableName));
+
+        // 創建一個Get對象
+        Get get = new Get(Bytes.toBytes(rowKey));
+        get.addFamily(Bytes.toBytes(cF));
+        // get.readAllVersions();
+
+        // 獲取數據的操作
+        Result result = table.get(get);
+        Cell[] cells = result.rawCells();
+        for (Cell cell : cells) {
+            printfCell(cell);
+        }
+    }
+
+    // 只取得 Column Qualifier 的資料
+    public String [] getCQData(String tableName, String rowKey, String cF) throws IOException {
+
+        // 獲取表對象
+        Table table = connection.getTable(TableName.valueOf(tableName));
+
+        // 創建一個Get對象
+        Get get = new Get(Bytes.toBytes(rowKey));
+        get.addFamily(Bytes.toBytes(cF));
+        // get.readAllVersions();
+
+        // 獲取數據的操作
+        int i = 0;
+        Result result = table.get(get);
+        Cell[] cells = result.rawCells();
+        String [] ans = new String[result.size()];
+        for (Cell cell : cells) {
+
+            // 查看 cell 裡面資料
+            printfCell(cell);
+
+            // 存儲 column qualifier 到 ans 中
+            ans [i] = Bytes.toString(CellUtil.cloneQualifier(cell));
+            i++;
+        }
+
+        return ans;
+    }
+
+    // 只取得 value 的資料
+    public String [] getValueData(String tableName, String rowKey, String cF, String cN) throws IOException {
+
+        // 獲取表對象
+        Table table = connection.getTable(TableName.valueOf(tableName));
+
+        // 創建一個Get對象
+        Get get = new Get(Bytes.toBytes(rowKey));
+        get.addColumn(Bytes.toBytes(cF), Bytes.toBytes(cN));
+        // get.readAllVersions();
+
+        // 獲取數據的操作
+        int i = 0;
+        Result result = table.get(get);
+        Cell[] cells = result.rawCells();
+        String [] ans = new String[result.size()];
+        for (Cell cell : cells) {
+
+            // 查看 cell 裡面資料
+            printfCell(cell);
+
+            // 存儲 value 到 ans 中
+            ans [i] = Bytes.toString(CellUtil.cloneValue(cell));
+            i++;
+        }
+
+        return ans;
+    }
+
+    // 限定 stamp 範圍，來取得 column qualifier, value 的資料
+    public cq_value getCqValueData(String tableName, String rowKey, String cF, long minStamp, long maxStamp) throws IOException {
+
+        // 獲取表對象
+        Table table = connection.getTable(TableName.valueOf(tableName));
+
+        // 創建一個Get對象
+        Get get = new Get(Bytes.toBytes(rowKey));
+        get.addFamily(Bytes.toBytes(cF));
+        get.setColumnFamilyTimeRange(Bytes.toBytes(cF), minStamp, maxStamp);
+        // get.readAllVersions();
+
+        // 獲取數據的操作
+        int i = 0;
+        Result result = table.get(get);
+        Cell[] cells = result.rawCells();
+        String[] ans_val = new String[result.size()];
+        String[] ans_cq = new String[result.size()];
+        for (Cell cell : cells) {
+
+            // 查看 cell 裡面資料
+            printfCell(cell);
+
+            // 存儲 cq, value 到 ans 中
+            ans_val [i] = Bytes.toString(CellUtil.cloneValue(cell));
+            ans_cq [i] = Bytes.toString(CellUtil.cloneQualifier(cell));
+            i++;
+        }
+
+        cq_value Cq_Value = new cq_value(ans_cq, ans_val);
+
+        return Cq_Value;
+    }
+
+
+
+    // 打印 hbase 單位資料 裡面存儲的資料
+    public void printfCell(Cell cell){
+        System.out.println("RK:" + Bytes.toString(CellUtil.cloneRow(cell))
+                + ", CF:" + Bytes.toString(CellUtil.cloneFamily(cell))
+                + ", CN:" + Bytes.toString(CellUtil.cloneQualifier(cell))
+                + ", VALUE:" + Bytes.toString(CellUtil.cloneValue(cell)));
+    }
+
 
     public Admin getAdmin() {
         return admin;

@@ -128,10 +128,10 @@ public class DataGenerator {
         HF.createTable("table1", arr,"All_of_the_time");
 
         String [] arr2 = new String[]{"100|", "101|", "102|", "103|", "104|", "105|", "106|", "107|"};
-        HF.createTable("table2", "People");
+        HF.createTable("table2", arr2,"People");
 
         String [] arr3 = new String[]{"200|", "201|", "202|", "203|", "204|", "205|", "206|", "207|"};
-        HF.createTable("table3", "All_position_time");
+        HF.createTable("table3", arr3,"All_position_time");
     }
 
     public static final int getRunStep() {
