@@ -77,10 +77,10 @@ public class DataGet {
         // 開始 table35 的讀取資料，並啟動計時器
         timer.startTimer();
         data02 = getDataByTable35("0912545411",
-                "2020-04-1T00:00:00",
-                "2020-04-30T00:00:00");
+                            "2020-04-1T00:00:00",
+                            "2020-04-30T00:00:00");
         timer.stopTimer();
-        System.out.println("data01 run time: " + timer.getRunTime());
+        System.out.println("data02 run time: " + timer.getRunTime());
 
         fileOperator.writeTotxt("data02", data02);
 
