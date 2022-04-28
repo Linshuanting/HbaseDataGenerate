@@ -41,7 +41,7 @@ public class DataGenerator {
 
         configuration = HBaseConfiguration.create();
         configuration.set("hbase.zookeeper.quorum", "140.115.52.28");
-        configuration.set("zookeeper.znode.parent", "/master");
+        configuration.set("zookeeper.znode.parent", "/hbase");
         HF = new HbaseTools();
         HF.setDataConfig(configuration);
 
@@ -56,6 +56,8 @@ public class DataGenerator {
 
         ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(
                 runStep * PeopleGenerator.getNumOfPeople());
+
+        //HF.deleteTable("");
 
         // 在此建立 table 來放資料
         createAllTable();

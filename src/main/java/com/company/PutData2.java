@@ -95,6 +95,12 @@ public class PutData2 {
 
     }
 
+    /*
+    row_key: (int)placeCode
+    columnFamily: pho
+    columnQualifier: (String)phonenum
+    value: (long)positionCode
+     */
     public static void putData(Connection connection, Table table, ArrayList<ArrayList<Object>> objectLists)
             throws IOException {
         ArrayList<Put> puts = new ArrayList<>(objectLists.size());
