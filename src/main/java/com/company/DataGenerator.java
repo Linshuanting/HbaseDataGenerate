@@ -23,6 +23,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * @author https://github.com/Linshuanting
+ * @author https://github.com/sShaAanGg
+ */
 public class DataGenerator {
     final private static int runStep = 10;
     private static BlockData Cluster[] = new BlockData[MapGenerator.getClusterNum()];
@@ -32,7 +36,6 @@ public class DataGenerator {
     // private static int minLimits = (60 - 0) / minInterval;
     private static Random random = new Random();
 
-
     // 新增需要連接到Hbase的設定
     private static Configuration configuration = null;
     private static HbaseTools HF;
@@ -41,7 +44,7 @@ public class DataGenerator {
 
         configuration = HBaseConfiguration.create();
         configuration.set("hbase.zookeeper.quorum", "140.115.52.28");
-        configuration.set("zookeeper.znode.parent", "/master");
+        configuration.set("zookeeper.znode.parent", "/hbase");
         HF = new HbaseTools();
         HF.setDataConfig(configuration);
 
@@ -49,7 +52,7 @@ public class DataGenerator {
 
     public static void main(String[] args) throws Exception, IOException {
 
-        final int numOfGeneration = 1000;
+        final int numOfGeneration = 30;
         LocalDate localDate = LocalDate.of(2020, 1, 1);
         // String filePath = new String("./test/data/data_from_" + localDate.toString()
         // + ".xlsx");
@@ -62,8 +65,10 @@ public class DataGenerator {
 
         // Instantiating a Connection class object and table object
         Connection connection = ConnectionFactory.createConnection();
-        //Table table1 = connection.getTable(TableName.valueOf("table1"));
-        //Table table2 = connection.getTable(TableName.valueOf("table2"));
+        Table table1 = connection.getTable(TableName.valueOf("scale1"));
+        Table table2 = connection.getTable(TableName.valueOf("scale2"));
+        // Table table1 = connection.getTable(TableName.valueOf("table6"));
+        // Table table2 = connection.getTable(TableName.valueOf("table7"));
         Table MAP = connection.getTable(TableName.valueOf("MAP"));
         Table PEOPLE = connection.getTable(TableName.valueOf("PEOPLE"));
 
@@ -74,7 +79,7 @@ public class DataGenerator {
         people = PeopleGenerator.getPeople(PEOPLE);
 
         for (int i = 0; i < numOfGeneration; i++) {
-            if (i % 100 == 0)
+            if (i % 10 == 0)
                 System.gc();
             System.out.println("Starting generation of the " + (Integer.toString(i + 1)) + "-th day's data.");
             for (Person p : people) {
@@ -100,12 +105,12 @@ public class DataGenerator {
                 }
                 p = null;
             }
-            //PutData1.putData(connection, table1, objectLists);
-            //PutData2.putData(connection, table2, objectLists);
+            PutData1.putData(connection, table1, objectLists);
+            PutData2.putData(connection, table2, objectLists);
 
-            PutData1.putData(HF, "table1", objectLists);
-            PutData2.putData(HF, "table2", objectLists);
-            PutData3.putData(HF, "table3", objectLists);
+            PutData1.putData(HF, "scale3", objectLists);
+            PutData2.putData(HF, "scale4", objectLists);
+            PutData3.putData(HF, "scale5", objectLists);
 
             objectLists.clear();
             localDate = localDate.plusDays(1);
@@ -115,8 +120,8 @@ public class DataGenerator {
         // Close table and connection
         MAP.close();
         PEOPLE.close();
-        //table1.close();
-        //table2.close();
+        table1.close();
+        table2.close();
         connection.close();
         return;
     }
@@ -124,14 +129,17 @@ public class DataGenerator {
     // 建立所有需要用到的table
     public static void createAllTable() throws IOException {
         // 建立table，並放入 splitKeys
-        String [] arr = new String[]{"000|", "001|", "002|", "003|", "004|", "005|", "006|", "007|"};
-        HF.createTable("table1", arr,"All_of_the_time");
+        // String[] arr = new String[] { "000|", "001|", "002|", "003|", "004|", "005|", "006|", "007|" };
+        // HF.createTable("scale3", arr, "All_of_the_time");
+        HF.createTable("scale3", "All_of_the_time");
 
-        String [] arr2 = new String[]{"100|", "101|", "102|", "103|", "104|", "105|", "106|", "107|"};
-        HF.createTable("table2", arr2,"People");
+        // String[] arr2 = new String[] { "100|", "101|", "102|", "103|", "104|", "105|", "106|", "107|" };
+        // HF.createTable("scale4", arr2, "People");
+        HF.createTable("scale4", "People");
 
-        String [] arr3 = new String[]{"200|", "201|", "202|", "203|", "204|", "205|", "206|", "207|"};
-        HF.createTable("table3", arr3,"All_position_time");
+        // String[] arr3 = new String[] { "200|", "201|", "202|", "203|", "204|", "205|", "206|", "207|" };
+        // HF.createTable("scale5", arr3, "All_position_time");
+        HF.createTable("scale5", "All_position_time");
     }
 
     public static final int getRunStep() {
@@ -264,7 +272,7 @@ public class DataGenerator {
         int pos = getPositionFromPair(XY);
 
         // if (pos > 10000) {
-        //     System.out.println(pos);
+        // System.out.println(pos);
         // }
         // 時間細節設定
         String time = getTime(date, hour, min);

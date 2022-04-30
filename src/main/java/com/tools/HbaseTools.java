@@ -144,7 +144,7 @@ public class HbaseTools {
 
         if (tableExist(tableName)) {
             System.out.println("表已經存在");
-            return;
+            deleteTable(tableName);
         }
 
         // 創建table description
@@ -176,7 +176,7 @@ public class HbaseTools {
 
         if (tableExist(tableName)) {
             System.out.println("表已經存在");
-            return;
+            deleteTable(tableName);
         }
 
         byte[][] bytesplitKeys = arr_to_byteArr(splitKeys);
