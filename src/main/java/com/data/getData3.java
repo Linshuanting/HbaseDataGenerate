@@ -33,6 +33,7 @@ public class getData3 {
         // 從資料庫中獲取資料 2022-04-30T00
         String[] ans = hf.getValueData(tableName, rowkey, ColumnFamily, time);
 
+
         return ans;
     }
 

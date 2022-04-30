@@ -193,7 +193,7 @@ public class HbaseTools {
             ColumnFamilyDescriptorBuilder columnFamilyDescriptorBuilder = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(cfs));
 
             // 設置column建表參數
-            columnFamilyDescriptorBuilder.setMaxVersions(3);
+            columnFamilyDescriptorBuilder.setMaxVersions(10);
 
             // 保存設置到table descriptor
             tableDescriptorBuilder.setColumnFamily(columnFamilyDescriptorBuilder.build());
@@ -286,7 +286,7 @@ public class HbaseTools {
         // 創建一個Get對象
         Get get = new Get(Bytes.toBytes(rowKey));
         get.addFamily(Bytes.toBytes(cF));
-        // get.readAllVersions();
+        get.readAllVersions();
 
         // 獲取數據的操作
         int i = 0;
@@ -315,7 +315,7 @@ public class HbaseTools {
         // 創建一個Get對象
         Get get = new Get(Bytes.toBytes(rowKey));
         get.addColumn(Bytes.toBytes(cF), Bytes.toBytes(cN));
-        // get.readAllVersions();
+        get.readAllVersions();
 
         // 獲取數據的操作
         int i = 0;
@@ -345,7 +345,8 @@ public class HbaseTools {
         Get get = new Get(Bytes.toBytes(rowKey));
         get.addFamily(Bytes.toBytes(cF));
         get.setColumnFamilyTimeRange(Bytes.toBytes(cF), minStamp, maxStamp);
-        // get.readAllVersions();
+
+        get.readAllVersions();
 
         // 獲取數據的操作
         int i = 0;

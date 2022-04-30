@@ -60,32 +60,80 @@ public class DataGet {
         // 創建寫檔 object
         FileOperator fileOperator = new FileOperator();
 
+        //String testphone = "0999999228";
+
+        String [] testphones = new String[]{"0923799856", "0924287276", "0924270243",
+        "0924166304", "0924055403", "0923954960","0923939462", "0923876364",
+        "0923835919", "0923799856"};
+
+        timer.initializeTimer();
+
+        for (String phone: testphones) {
+            run34Table(timer, phone);
+        }
+
+        System.out.println("data01 average run time: " + timer.getAverageRunTime() + "ms");
+
+        timer.initializeTimer();
+
+        for (String phone: testphones) {
+            run35Table(timer, phone);
+        }
+
+        System.out.println("data02 average run time: " + timer.getAverageRunTime() + "ms");
+
+
+
+    }
+
+    public static void run34Table(timer timer, String testphone) throws IOException {
+
+        String [][] data;
+
+        System.out.println("===========================================");
+        System.out.println("Now test phoneNum: " + testphone);
         // 開始 table34 的讀取資料，並啟動計時器
         // 需要選擇一個確診的人，並匡列出此人行動的時間
         // 得到的 data 即為可能確診接觸人
         // 時間需要依照該格式：2020-04-30T00:00:00
         // minTime, maxTime 為開始的時間以及結束的時間
         timer.startTimer();
-        data01 = getDataByTable34("0912545411",
-                            "2020-04-1T00:00:00",
-                            "2020-04-30T00:00:00");
+        data = getDataByTable34(testphone,
+                "2020-01-01T00:00:00",
+                "2021-01-30T00:00:00");
         timer.stopTimer();
-        System.out.println("data01 run time: " + timer.getRunTime());
+        timer.recordRunTime();
+        System.out.println("data01 run time: " + timer.getRunTime() + "ms");
 
-        fileOperator.writeTotxt("data01", data01);
+        System.out.println("===========================================");
 
-        // 開始 table35 的讀取資料，並啟動計時器
-        timer.startTimer();
-        data02 = getDataByTable35("0912545411",
-                            "2020-04-1T00:00:00",
-                            "2020-04-30T00:00:00");
-        timer.stopTimer();
-        System.out.println("data02 run time: " + timer.getRunTime());
-
-        fileOperator.writeTotxt("data02", data02);
-
+        //fileOperator.writeTotxtExceptPhonenum("data01", data, testphone);
     }
 
+     public static void run35Table(timer timer, String testphone) throws IOException {
+
+        String [][] data;
+
+         System.out.println("===========================================");
+         System.out.println("Now test phoneNum: " + testphone);
+         // 開始 table34 的讀取資料，並啟動計時器
+         // 需要選擇一個確診的人，並匡列出此人行動的時間
+         // 得到的 data 即為可能確診接觸人
+         // 時間需要依照該格式：2020-04-30T00:00:00
+         // minTime, maxTime 為開始的時間以及結束的時間
+         timer.startTimer();
+         data = getDataByTable35(testphone,
+                 "2020-01-01T00:00:00",
+                 "2021-01-30T00:00:00");
+         timer.stopTimer();
+         timer.recordRunTime();
+         System.out.println("data02 run time: " + timer.getRunTime() + "ms");
+
+         //fileOperator.writeTotxtExceptPhonenum("data02", data, testphone);
+
+         System.out.println("===========================================");
+
+     }
 
     // 取得 table3 & table4 合作的資料
     // phonenum 為電話號碼 09xxxxxxxx
@@ -106,7 +154,7 @@ public class DataGet {
 
         for (int i = 0; i < datas.getLength(); i++) {
 
-             ans[i] = getData2.getData(HF, columnQualifiers[i], values[i]);
+             ans[i] = getData2.getData(HF, values[i], columnQualifiers[i]);
 
         }
 
@@ -133,7 +181,7 @@ public class DataGet {
 
         for (int i = 0; i < datas.getLength(); i++) {
 
-            ans[i] = getData3.getData(HF, columnQualifiers[i], values[i]);
+            ans[i] = getData3.getData(HF, values[i], columnQualifiers[i] );
 
         }
 
