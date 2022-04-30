@@ -60,6 +60,8 @@ public class DataGenerator {
         ArrayList<ArrayList<Object>> objectLists = new ArrayList<ArrayList<Object>>(
                 runStep * PeopleGenerator.getNumOfPeople());
 
+        //HF.deleteTable("");
+
         // 在此建立 table 來放資料
         createAllTable();
 

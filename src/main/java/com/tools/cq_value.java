@@ -11,10 +11,12 @@ public class cq_value {
 
     private String cq[] ;
     private String value[] ;
+    private int length;
 
     public cq_value(String[] cq, String[] value) {
         this.cq = cq;
         this.value = value;
+        this.length = cq.length;
     }
 
     public cq_value(){
@@ -35,5 +37,13 @@ public class cq_value {
 
     public void setValue(String[] value) {
         this.value = value;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
     }
 }
