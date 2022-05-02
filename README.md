@@ -6,6 +6,7 @@ Contributors:
 https://github.com/sShaAanGg  
 https://github.com/Linshuanting
 ---
+**Please run the commands below at the root directory (HbaseDataGenerate)**
 ## Compile
 ```mvn package (or mvn verify)```
 
