@@ -1,7 +1,6 @@
 *vscode*
 *settings.json*
-
-dependencies.txt
-maven-status
-maven-archiver
-HbaseDataGenerate-1.0-SNAPSHOT.jar
+*.class
+*.txt
+*.properties
+*.jar
