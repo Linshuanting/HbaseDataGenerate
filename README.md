@@ -20,6 +20,8 @@ https://github.com/Linshuanting
 ```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.MapGenerator```
 
 ```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.PeopleGenerator```
+## Result of our experiment
+![](/../final/assets/Result.png)
 
 ------
 The class **BlockData in datamap.java** is moved into **DataGenerator.java** and The class **Person in datamap.java** is moved into **People.java**.
