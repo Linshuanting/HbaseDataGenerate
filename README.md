@@ -38,6 +38,7 @@ https://github.com/Linshuanting
 
 ## Result of our experiment
 ![](./assets/Result.png)
+
 ---
 ```
 /* Definiton of living pattern
