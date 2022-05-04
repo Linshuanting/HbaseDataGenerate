@@ -7,6 +7,8 @@ https://github.com/sShaAanGg
 https://github.com/Linshuanting
 
 ---
+
+**Please run the commands below at the root directory (HbaseDataGenerate)**
 ## Environment
 1. **Centos7.9**
 2. **Java-1.8.0_202**

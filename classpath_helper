@@ -1,7 +1,0 @@
-#!/bin/zsh
-
-#export CLASSPATH=:./target/classes:../lib/*
-
-#export CLASSPATH=target/HbaseDataGenerate-1.0-SNAPSHOT.jar:../lib/*:./target/classes/*:../poi-lib/poi-bin-5.2.2/*:../poi-lib/poi-bin-5.2.2/lib/*:
-
-export CLASSPATH=../lib/*:../poi-lib/poi-bin-5.2.2/*:../poi-lib/poi-bin-5.2.2/lib/*:../poi-lib/poi-bin-5.2.2/ooxml-lib/*:./target/classes/*:target/HbaseDataGenerate-1.0-SNAPSHOT.jar
