@@ -3,8 +3,8 @@
 專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
 Contributors:  
-https://github.com/sShaAanGg  
-https://github.com/Linshuanting
+[sShaAanGg](https://github.com/sShaAanGg)
+[Linshuanting](https://github.com/Linshuanting)
 
 ---
 **Please run the commands below at the root directory (HbaseDataGenerate)**
