@@ -7,6 +7,8 @@ https://github.com/sShaAanGg
 https://github.com/Linshuanting
 
 ---
+
+**Please run the commands below at the root directory (HbaseDataGenerate)**
 ## Environment
 1. **Centos7.9**
 2. **Java-1.8.0_202**
@@ -30,11 +32,13 @@ https://github.com/Linshuanting
 
 ------
 ## Introduction
+
 地圖大小(size)為1000*1000，有100000個人走訪地圖。     
 將100000個人依照下方 living pattern 來走訪，並將生成的資料放置於Hbase中
----
-![](/../patch-1/assets/DefinitionOfLivingPattern.jpg)
 
+## Result of our experiment
+![](./assets/Result.png)
+---
 ```
 /* Definiton of living pattern
     1 : 白天活動，活動路線固定
