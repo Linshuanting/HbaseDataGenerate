@@ -1,14 +1,10 @@
 # HbaseDataGenerate
-
 專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
-Contributors:   
-https://github.com/sShaAanGg   
-https://github.com/Linshuanting
+Contributors:  
+[sShaAanGg](https://github.com/sShaAanGg)  
+[Linshuanting](https://github.com/Linshuanting)
 
----
-
-**Please run the commands below at the root directory (HbaseDataGenerate)**
 ## Environment
 1. **Centos7.9**
 2. **Java-1.8.0_202**
@@ -16,7 +12,11 @@ https://github.com/Linshuanting
 4. **Zookeeper-3.6.3**
 5. **Hbase-2.3.7**
 6. **maven-3.8.5**
+## Result of our experiment
+![](/../final/assets/Result.png)
 
+---
+**Please run the commands below at the root directory (HbaseDataGenerate)**
 ## Compile
 ```mvn package (or mvn verify)```
 
@@ -40,27 +40,6 @@ https://github.com/Linshuanting
 ![](./assets/Result.png)
 
 ---
-```
-/* Definiton of living pattern
-    1 : 白天活動，活動路線固定
-    3 : 白天活動，路線不固定
-    2 : 晚上活動，路線固定
-    3 : 晚上活動，路線不固定
-    4 : 白天夜晚都會活動，路線固定
-    5 : 白天夜晚都會活動，路線不固定
-    6 : 活動時間與路徑相對隨機
-    
-    更改成
-    1 : 早八晚五型，目標相同
-    2 : 早八晚五型，目標不同
-    3 : 早八晚五型，無活動
-    4 : 早八午十二，單目標
-    5 : 午十二晚五，單目標
-    6 : 活動時間與路徑相對隨機 
-*/
-```
----
-
 ### Pattern 01 Table Design
 
 #### Table01
