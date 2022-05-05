@@ -3,8 +3,17 @@
 專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
 Contributors:  
-[sShaAanGg](https://github.com/sShaAanGg)
+[sShaAanGg](https://github.com/sShaAanGg)  
 [Linshuanting](https://github.com/Linshuanting)
+## Environment
+1. **Centos7.9**
+2. **Java-1.8.0_202**
+3. **Hadoop-3.2.1**
+4. **Zookeeper-3.6.3**
+5. **Hbase-2.3.7**
+6. **maven-3.8.5**
+## Result of our experiment
+![](/../final/assets/Result.png)
 
 ---
 **Please run the commands below at the root directory (HbaseDataGenerate)**
@@ -20,8 +29,6 @@ Contributors:
 ```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.MapGenerator```
 
 ```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.PeopleGenerator```
-## Result of our experiment
-![](/../final/assets/Result.png)
 
 ------
 The class **BlockData in datamap.java** is moved into **DataGenerator.java** and The class **Person in datamap.java** is moved into **People.java**.
