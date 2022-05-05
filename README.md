@@ -1,10 +1,10 @@
 # HbaseDataGenerate
-
 專題，用來產生COVID-19的亂數資料，來做資料庫的使用
 
 Contributors:  
 [sShaAanGg](https://github.com/sShaAanGg)  
 [Linshuanting](https://github.com/Linshuanting)
+
 ## Environment
 1. **Centos7.9**
 2. **Java-1.8.0_202**
@@ -31,14 +31,53 @@ Contributors:
 ```java -cp $CLASSPATH:target/HbaseDataGenerate-1.0-SNAPSHOT.jar com.company.PeopleGenerator```
 
 ------
-The class **BlockData in datamap.java** is moved into **DataGenerator.java** and The class **Person in datamap.java** is moved into **People.java**.
+## Introduction
 
-地圖生成的程式碼基本上都被移到 **MapGenerator.java** 裡，MapGenerator 會將地圖資料生成。而 DataGenerator 就只是裡讀取地圖，隨機生成一些人隨機拜訪某些場所生成資料。
+地圖大小(size)為1000*1000，有100000個人走訪地圖。     
+將100000個人依照下方 living pattern 來走訪，並將生成的資料放置於Hbase中
 
-接下來我想的到的地圖作法是手動標記，標記一個2維陣列中有場所代碼的點。再來就是將人依據生活模式分類以生成合理資料。
+## Result of our experiment
+![](./assets/Result.png)
 
-現在 **PeopleGenerator.java** 生成固定的居民同時把 class **Person** 移進去，不同的人有不同的移動、生活模式，除此之外還得考慮時間像是白天活動或是晚上活動等等。這樣地圖和人都確定下來，生成資料應該會比較容易。
+---
+### Pattern 01 Table Design
 
-**test/data/data_from_2020-01-01.xlsx is the sample data generated from DataGenerator.java**
+#### Table01
+**row_key**: (String) phonenum  
+**columnFamily**: pos   
+**columnQualifier**: (long)positionCode 
+**value**: (int)placeCode   
 
-地圖改為 1000 * 1000，有 100000 個人走訪地圖。
+#### Table02
+**row_key**: (int)placeCode 
+**columnFamily**: pho   
+**columnQualifier**: (String)phonenum   
+**value**: (long)positionCode   
+
+### Pattern 02 Table Design
+
+#### Table03
+**row_key**: (String)xxx_phonenum   
+**columnFamily**: All_of_the_time   
+**columnQualifier**: (String)time   
+**value**: (String)placeCode  
+
+#### Table04
+**row_key**: (String)xxx_placecode_time   
+**columnFamily**: People   
+**columnQualifier**: (String)phonenum   
+**value**: null
+
+### Pattern 03 Table Design
+
+#### Table03
+**row_key**: (String)xxx_phonenum   
+**columnFamily**: All_of_the_time   
+**columnQualifier**: (String)time   
+**value**: (String)placeCode
+
+#### Table05
+**row_key**: (String)xxx_placecode   
+**columnFamily**: All_position_time   
+**columnQualifier**: (String)time   
+**value**: phonenum
