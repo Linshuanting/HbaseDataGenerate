@@ -12,8 +12,6 @@ Contributors:
 4. **Zookeeper-3.6.3**
 5. **Hbase-2.3.7**
 6. **maven-3.8.5**
-## Result of our experiment
-![](/../final/assets/Result.png)
 
 ---
 **Please run the commands below at the root directory (HbaseDataGenerate)**
